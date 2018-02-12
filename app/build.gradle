@@ -4,6 +4,7 @@ plugins {
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
+apply plugin: 'kotlin-kapt'
 
 detekt {
     version = versions.detekt
@@ -60,9 +61,29 @@ android {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation 'org.jetbrains.kotlin:kotlin-stdlib-jre7:'+ versions.kotlin
+    implementation 'org.jetbrains.kotlin:kotlin-stdlib-jre7:' + versions.kotlin
+
     implementation 'com.android.support:appcompat-v7:' + versions.support
+    implementation 'com.android.support:design:' + versions.support
+    implementation 'com.android.support:recyclerview-v7:' + versions.support
     implementation 'com.android.support.constraint:constraint-layout:' + versions.constraint_layout
+
+    // retrofit
+    implementation 'com.squareup.retrofit2:retrofit:' + versions.retrofit
+    implementation 'com.squareup.retrofit2:converter-gson:' + versions.retrofit
+    implementation 'com.squareup.retrofit2:adapter-rxjava2:' + versions.retrofit
+
+    // dagger
+    implementation 'com.google.dagger:dagger:' + versions.dagger
+    kapt 'com.google.dagger:dagger-compiler:' + versions.dagger
+    implementation 'com.google.dagger:dagger-android-support:' + versions.dagger
+    kapt 'com.google.dagger:dagger-android-processor:' + versions.dagger
+
+    // lifecycle aware components
+    implementation 'android.arch.lifecycle:livedata:' + versions.archLifecycle
+    implementation 'android.arch.lifecycle:viewmodel:' + versions.archLifecycle
+    implementation 'android.arch.lifecycle:extensions:' + versions.archLifecycle
+    annotationProcessor 'android.arch.lifecycle:compiler:' + versions.archLifecycle
 
     // testing
     testImplementation 'junit:junit:' + versions.junit

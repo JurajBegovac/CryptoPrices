@@ -8,6 +8,9 @@ def versions = [:]
 versions.kotlin = '1.2.21'
 versions.support = '26.1.0'
 versions.constraint_layout = '1.0.2'
+versions.retrofit = '2.3.0'
+versions.dagger = '2.14.1'
+versions.archLifecycle = '1.1.0'
 
 // static analysis
 versions.detekt = '1.0.0.RC6-3'
