@@ -9,6 +9,9 @@ versions.kotlin = '1.2.21'
 versions.support = '26.1.0'
 versions.constraint_layout = '1.0.2'
 
+// static analysis
+versions.detekt = '1.0.0.RC6-3'
+
 // testing
 versions.junit = '4.12'
 versions.espresso = '3.0.1'
