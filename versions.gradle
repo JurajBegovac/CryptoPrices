@@ -11,6 +11,9 @@ versions.constraint_layout = '1.0.2'
 versions.retrofit = '2.3.0'
 versions.dagger = '2.14.1'
 versions.archLifecycle = '1.1.0'
+versions.rxjava2 = '2.1.9'
+versions.rx_android = '2.0.1'
+versions.rx_kotlin = '2.2.0'
 
 // static analysis
 versions.detekt = '1.0.0.RC6-3'
