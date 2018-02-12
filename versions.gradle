@@ -1,0 +1,17 @@
+/**
+ * Shared file between builds so that they can all use the same dependencies and
+ * maven repositories.
+ **/
+ext.versions = [:]
+
+def versions = [:]
+versions.kotlin = '1.2.21'
+versions.support = '26.1.0'
+versions.constraint_layout = '1.0.2'
+
+// testing
+versions.junit = '4.12'
+versions.espresso = '3.0.1'
+versions.test_runner = '1.0.1'
+
+ext.versions = versions
