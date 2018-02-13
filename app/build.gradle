@@ -78,6 +78,7 @@ dependencies {
 
     // dagger
     implementation 'com.google.dagger:dagger:' + versions.dagger
+    implementation 'com.android.support.constraint:constraint-layout:1.0.2'
     kapt 'com.google.dagger:dagger-compiler:' + versions.dagger
     implementation 'com.google.dagger:dagger-android-support:' + versions.dagger
     kapt 'com.google.dagger:dagger-android-processor:' + versions.dagger
@@ -92,6 +93,9 @@ dependencies {
     implementation 'io.reactivex.rxjava2:rxjava:' + versions.rxjava2
     implementation 'io.reactivex.rxjava2:rxandroid:' + versions.rx_android
     implementation 'io.reactivex.rxjava2:rxkotlin:' + versions.rx_kotlin
+
+    // rx preferences
+    implementation 'com.f2prateek.rx.preferences2:rx-preferences:' + versions.rx_preferences
 
     // testing
     testImplementation 'junit:junit:' + versions.junit

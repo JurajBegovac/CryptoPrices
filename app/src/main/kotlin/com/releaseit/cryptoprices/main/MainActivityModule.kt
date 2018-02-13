@@ -1,5 +1,6 @@
 package com.releaseit.cryptoprices.main
 
+import android.content.SharedPreferences
 import com.releaseit.cryptoprices.list.CryptoListFragment
 import com.releaseit.cryptoprices.list.CryptoListViewModelFactory
 import com.releaseit.cryptoprices.repository.CryptoRepository
@@ -15,7 +16,8 @@ import dagger.android.ContributesAndroidInjector
 class MainActivityModule {
 
   @Provides
-  fun cryptoListViewModelFactory(cryptoRepository: CryptoRepository) = CryptoListViewModelFactory(cryptoRepository)
+  fun cryptoListViewModelFactory(cryptoRepository: CryptoRepository, sharedPreferences: SharedPreferences) =
+    CryptoListViewModelFactory(cryptoRepository, sharedPreferences)
 }
 
 @Module

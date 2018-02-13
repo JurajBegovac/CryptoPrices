@@ -58,6 +58,10 @@ class AppModule {
   @Provides
   @Singleton
   fun cryptoRepository(webService: CryptoWebService): CryptoRepository = WebCryptoRepository(webService)
+
+  @Provides
+  fun sharedPrefs(@ApplicationContext context: Context) = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
+
 }
 
 @Singleton

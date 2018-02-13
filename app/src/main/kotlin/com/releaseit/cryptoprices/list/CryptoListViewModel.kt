@@ -3,9 +3,11 @@ package com.releaseit.cryptoprices.list
 import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.ViewModel
 import android.arch.lifecycle.ViewModelProvider
+import android.content.SharedPreferences
+import com.releaseit.cryptoprices.currency
+import com.releaseit.cryptoprices.currencyObservable
 import com.releaseit.cryptoprices.repository.Crypto
 import com.releaseit.cryptoprices.repository.CryptoRepository
-import com.releaseit.cryptoprices.repository.Currency
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
@@ -26,7 +28,8 @@ sealed class StateError {
   object Unknown : Error()
 }
 
-class CryptoListViewModel(private val repository: CryptoRepository) : ViewModel() {
+class CryptoListViewModel(private val repository: CryptoRepository,
+                          private val sharedPreferences: SharedPreferences) : ViewModel() {
 
   private val compositeDisposable = CompositeDisposable()
 
@@ -34,7 +37,7 @@ class CryptoListViewModel(private val repository: CryptoRepository) : ViewModel(
 
   init {
     state.value = State.initial()
-    compositeDisposable.add(loadCryptosDisposable())
+    compositeDisposable.addAll(loadCryptosDisposable(), currencyDisposable())
   }
 
   override fun onCleared() {
@@ -43,7 +46,7 @@ class CryptoListViewModel(private val repository: CryptoRepository) : ViewModel(
   }
 
   private fun loadCryptosDisposable() =
-    repository.getCryptos(Currency.USD, "100")
+    repository.getCryptos(sharedPreferences.currency(), "100")
       .subscribeOn(Schedulers.io())
       .observeOn(AndroidSchedulers.mainThread())
       .subscribe({ success, error ->
@@ -57,6 +60,8 @@ class CryptoListViewModel(private val repository: CryptoRepository) : ViewModel(
                    }
                  })
 
+  private fun currencyDisposable() = sharedPreferences.currencyObservable().subscribe { reloadData() }
+
   /**
    * Command that view can use for reloading data
    */
@@ -68,10 +73,11 @@ class CryptoListViewModel(private val repository: CryptoRepository) : ViewModel(
   }
 }
 
-class CryptoListViewModelFactory(private val repository: CryptoRepository) : ViewModelProvider.Factory {
+class CryptoListViewModelFactory(private val repository: CryptoRepository,
+                                 private val sharedPreferences: SharedPreferences) : ViewModelProvider.Factory {
   override fun <T : ViewModel?> create(modelClass: Class<T>): T {
     if (modelClass.isAssignableFrom(CryptoListViewModel::class.java)) {
-      return CryptoListViewModel(repository) as T
+      return CryptoListViewModel(repository, sharedPreferences) as T
     }
     throw IllegalArgumentException("Unknown ViewModel class")
   }
