@@ -15,7 +15,11 @@ import java.net.UnknownHostException
  * Created by jurajbegovac on 12/02/2018.
  */
 
-data class State(val items: List<Crypto>, val error: Error?)
+data class State(val items: List<Crypto>, val error: Error?, val showLoading: Boolean) {
+  companion object {
+    fun initial() = State(emptyList(), null, true)
+  }
+}
 
 sealed class StateError {
   object NoInternet : Error()
@@ -29,6 +33,7 @@ class CryptoListViewModel(private val repository: CryptoRepository) : ViewModel(
   val state = MutableLiveData<State>()
 
   init {
+    state.value = State.initial()
     compositeDisposable.add(loadCryptosDisposable())
   }
 
@@ -37,25 +42,30 @@ class CryptoListViewModel(private val repository: CryptoRepository) : ViewModel(
     super.onCleared()
   }
 
-  fun reloadData() {
-    compositeDisposable.clear()
-    compositeDisposable.add(loadCryptosDisposable())
-  }
-
   private fun loadCryptosDisposable() =
     repository.getCryptos(Currency.USD, "100")
       .subscribeOn(Schedulers.io())
       .observeOn(AndroidSchedulers.mainThread())
       .subscribe({ success, error ->
                    if (success != null) {
-                     state.value = State(success, null)
+                     state.value = State(success, null, false)
                    } else if (error != null) {
-                     val currentItems = state.value?.items ?: emptyList()
+                     val currentState = state.value ?: State.initial()
                      val stateError =
                        if (error is UnknownHostException) StateError.NoInternet else StateError.Unknown
-                     state.value = State(currentItems, stateError)
+                     state.value = currentState.copy(error = stateError, showLoading = false)
                    }
                  })
+
+  /**
+   * Command that view can use for reloading data
+   */
+  fun reloadData() {
+    // show loading
+    state.value = state.value?.copy(showLoading = true) ?: State.initial().copy(showLoading = true)
+    // make new query
+    compositeDisposable.add(loadCryptosDisposable())
+  }
 }
 
 class CryptoListViewModelFactory(private val repository: CryptoRepository) : ViewModelProvider.Factory {
