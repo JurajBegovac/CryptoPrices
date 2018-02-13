@@ -75,12 +75,12 @@ class CryptoListFragment : DaggerFragment() {
  * Mapper from Crypto to CryptoListItem
  */
 internal val Crypto.listItem: CryptoListItem
-  get() = CryptoListItem(rank, symbol, price, _24hVolume)
+  get() = CryptoListItem(rank, symbol, "$price ${currency.name}", "$percentChange24h%")
 
 /**
  * List item
  */
-data class CryptoListItem(val rank: String, val symbol: String, val price: String, val volume24h: String)
+data class CryptoListItem(val rank: String, val symbol: String, val price: String, val percentChange24h: String)
 
 /**
  * Recyclerview adapter
@@ -105,6 +105,6 @@ internal class CryptoViewHolder(itemView: View) : RecyclerView.ViewHolder(itemVi
     itemView.itemCryptoRank.text = item.rank
     itemView.itemCryptoSymbol.text = item.symbol
     itemView.itemCryptoPrice.text = item.price
-    itemView.itemCryptoVolume24h.text = item.volume24h
+    itemView.itemCryptoVolume24h.text = item.percentChange24h
   }
 }

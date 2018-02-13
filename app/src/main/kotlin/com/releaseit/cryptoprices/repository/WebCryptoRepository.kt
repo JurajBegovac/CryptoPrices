@@ -27,10 +27,10 @@ class WebCryptoRepository(private val webService: CryptoWebService) : CryptoRepo
                   Currency.CNY -> cryptoResponse.priceCny
                 } ?: ""
     val volume24h = when (currency) {
-                       Currency.USD -> cryptoResponse._24hVolumeUsd
-                       Currency.EUR -> cryptoResponse._24hVolumeEur
-                       Currency.CNY -> cryptoResponse._24hVolumeCny
-                     } ?: ""
+                      Currency.USD -> cryptoResponse._24hVolumeUsd
+                      Currency.EUR -> cryptoResponse._24hVolumeEur
+                      Currency.CNY -> cryptoResponse._24hVolumeCny
+                    } ?: ""
     return Crypto(cryptoResponse.id,
                   cryptoResponse.name,
                   cryptoResponse.rank,
@@ -42,7 +42,7 @@ class WebCryptoRepository(private val webService: CryptoWebService) : CryptoRepo
                   cryptoResponse.percentChange24h ?: "",
                   cryptoResponse.percentChange7d ?: "",
                   cryptoResponse.availableSupply ?: "",
-                  cryptoResponse.totalSupply ?: ""
-                 )
+                  cryptoResponse.totalSupply ?: "",
+                  currency)
   }
 }

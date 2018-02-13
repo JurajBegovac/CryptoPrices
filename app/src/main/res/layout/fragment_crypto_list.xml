@@ -5,9 +5,17 @@
   android:layout_height="match_parent"
   tools:context="com.releaseit.cryptoprices.list.CryptoListFragment">
 
-  <android.support.v7.widget.RecyclerView
-    android:id="@+id/cryptoListFragmentRecylerView"
+  <LinearLayout
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:scrollbars="vertical" />
+    android:orientation="vertical">
+
+    <include layout="@layout/item_crypto" />
+
+    <android.support.v7.widget.RecyclerView
+      android:id="@+id/cryptoListFragmentRecylerView"
+      android:layout_width="match_parent"
+      android:layout_height="match_parent"
+      android:scrollbars="vertical" />
+  </LinearLayout>
 </android.support.v4.widget.SwipeRefreshLayout>
