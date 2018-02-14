@@ -23,5 +23,6 @@ versions.detekt = '1.0.0.RC6-3'
 versions.junit = '4.12'
 versions.espresso = '3.0.1'
 versions.test_runner = '1.0.1'
+versions.mockito = '2.15.0'
 
 ext.versions = versions

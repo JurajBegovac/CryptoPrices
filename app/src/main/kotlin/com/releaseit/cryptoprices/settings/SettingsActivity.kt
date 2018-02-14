@@ -2,13 +2,11 @@ package com.releaseit.cryptoprices.settings
 
 import android.content.Context
 import android.content.Intent
-import android.content.SharedPreferences
 import android.os.Bundle
 import android.widget.RadioButton
 import com.releaseit.cryptoprices.R
-import com.releaseit.cryptoprices.currency
 import com.releaseit.cryptoprices.repository.Currency
-import com.releaseit.cryptoprices.saveCurrency
+import com.releaseit.cryptoprices.utils.Prefs
 import dagger.android.support.DaggerAppCompatActivity
 import kotlinx.android.synthetic.main.activity_settings.*
 import javax.inject.Inject
@@ -20,7 +18,7 @@ class SettingsActivity : DaggerAppCompatActivity() {
   }
 
   @Inject
-  lateinit var sharedPrefs: SharedPreferences
+  lateinit var prefs: Prefs
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
@@ -32,7 +30,7 @@ class SettingsActivity : DaggerAppCompatActivity() {
       setDisplayShowHomeEnabled(true)
     }
 
-    val currentCurrency = sharedPrefs.currency()
+    val currentCurrency = prefs.currency
 
     Currency.values()
       .forEach {
@@ -54,6 +52,6 @@ class SettingsActivity : DaggerAppCompatActivity() {
   }
 
   private fun currencySelected(currency: Currency) {
-    sharedPrefs.saveCurrency(currency)
+    prefs.currency = currency
   }
 }

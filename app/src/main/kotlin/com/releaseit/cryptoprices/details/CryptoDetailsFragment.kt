@@ -2,7 +2,6 @@ package com.releaseit.cryptoprices.details
 
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
-import android.content.SharedPreferences
 import android.os.Bundle
 import android.support.annotation.StringRes
 import android.support.v4.app.Fragment
@@ -14,6 +13,8 @@ import android.view.ViewGroup
 import com.releaseit.cryptoprices.R
 import com.releaseit.cryptoprices.repository.Crypto
 import com.releaseit.cryptoprices.repository.CryptoRepository
+import com.releaseit.cryptoprices.utils.Prefs
+import com.releaseit.cryptoprices.utils.SchedulerProvider
 import com.releaseit.cryptoprices.utils.inflate
 import com.releaseit.cryptoprices.utils.showToast
 import dagger.android.support.DaggerFragment
@@ -41,7 +42,10 @@ class CryptoDetailsFragment : DaggerFragment() {
   lateinit var repository: CryptoRepository
 
   @Inject
-  lateinit var sharedPreferences: SharedPreferences
+  lateinit var prefs: Prefs
+
+  @Inject
+  lateinit var schedulerProvider: SchedulerProvider
 
   private lateinit var viewModel: CryptoDetailsViewModel
 
@@ -49,7 +53,8 @@ class CryptoDetailsFragment : DaggerFragment() {
     super.onActivityCreated(savedInstanceState)
     viewModel =
       ViewModelProviders.of(this,
-                            CryptoDetailsViewModelFactory(arguments.getString(KEY_ID)!!, repository, sharedPreferences))
+                            CryptoDetailsViewModelFactory(arguments.getString(KEY_ID)!!, repository,
+                                                          prefs, schedulerProvider))
         .get(CryptoDetailsViewModel::class.java)
     viewModel.state.observe(this, Observer<State> { renderState(it) })
   }

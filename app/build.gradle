@@ -99,6 +99,8 @@ dependencies {
 
     // testing
     testImplementation 'junit:junit:' + versions.junit
+    testImplementation 'org.mockito:mockito-core:' + versions.mockito
+    testImplementation 'android.arch.core:core-testing:' + versions.archLifecycle
     androidTestImplementation 'com.android.support.test:runner:' + versions.test_runner
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:' + versions.espresso
 }
