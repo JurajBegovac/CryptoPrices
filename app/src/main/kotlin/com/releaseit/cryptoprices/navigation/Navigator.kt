@@ -12,4 +12,5 @@ sealed class Screen {
 
 interface Navigator {
   fun navigateTo(screen: Screen)
+  fun navigateBack()
 }

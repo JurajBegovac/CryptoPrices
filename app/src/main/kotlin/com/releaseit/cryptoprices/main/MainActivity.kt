@@ -2,8 +2,6 @@ package com.releaseit.cryptoprices.main
 
 import android.os.Bundle
 import android.support.v4.app.Fragment
-import android.view.Menu
-import android.view.MenuItem
 import com.releaseit.cryptoprices.R
 import com.releaseit.cryptoprices.details.CryptoDetailsFragment
 import com.releaseit.cryptoprices.list.CryptoListFragment
@@ -22,25 +20,16 @@ class MainActivity : DaggerAppCompatActivity(), Navigator {
       navigateTo(Screen.CryptoList)
   }
 
-  override fun onCreateOptionsMenu(menu: Menu): Boolean {
-    menuInflater.inflate(R.menu.menu_main, menu)
-    return true
-  }
-
-  override fun onOptionsItemSelected(item: MenuItem): Boolean {
-    if (item.itemId == R.id.menu_action_settings) {
-      navigateTo(Screen.Settings)
-      return true
-    }
-    return super.onOptionsItemSelected(item)
-  }
-
   override fun navigateTo(screen: Screen) =
     when (screen) {
       Screen.CryptoList       -> showFragment(CryptoListFragment.newInstance())
       is Screen.CryptoDetails -> showFragmentWithBackStack(CryptoDetailsFragment.newInstance(screen.id))
       Screen.Settings         -> startActivity(SettingsActivity.startIntent(this))
     }
+
+  override fun navigateBack() {
+    onBackPressed()
+  }
 
   private fun showFragment(fragment: Fragment) {
     supportFragmentManager.beginTransaction()
@@ -54,5 +43,4 @@ class MainActivity : DaggerAppCompatActivity(), Navigator {
       .replace(R.id.mainActivityContainer, fragment)
       .commit()
   }
-
 }

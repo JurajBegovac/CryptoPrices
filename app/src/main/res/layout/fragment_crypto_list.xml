@@ -1,21 +1,39 @@
-<android.support.v4.widget.SwipeRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:app="http://schemas.android.com/apk/res-auto"
   xmlns:tools="http://schemas.android.com/tools"
-  android:id="@+id/cryptoListFragmentSwipeRefreshLayout"
   android:layout_width="match_parent"
   android:layout_height="match_parent"
+  android:orientation="vertical"
   tools:context="com.releaseit.cryptoprices.list.CryptoListFragment">
 
-  <LinearLayout
+  <android.support.v7.widget.Toolbar
+    android:id="@+id/cryptoListFragmentToolbar"
+    android:layout_width="match_parent"
+    android:layout_height="?attr/actionBarSize"
+    android:background="@color/colorPrimary"
+    android:gravity="center"
+    app:title="@string/app_name"
+    app:titleTextColor="@android:color/white" />
+
+  <android.support.v4.widget.SwipeRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/cryptoListFragmentSwipeRefreshLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    tools:context="com.releaseit.cryptoprices.list.CryptoListFragment">
 
-    <include layout="@layout/item_crypto" />
-
-    <android.support.v7.widget.RecyclerView
-      android:id="@+id/cryptoListFragmentRecylerView"
+    <LinearLayout
       android:layout_width="match_parent"
       android:layout_height="match_parent"
-      android:scrollbars="vertical" />
-  </LinearLayout>
-</android.support.v4.widget.SwipeRefreshLayout>
+      android:orientation="vertical">
+
+      <include layout="@layout/item_crypto" />
+
+      <android.support.v7.widget.RecyclerView
+        android:id="@+id/cryptoListFragmentRecylerView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scrollbars="vertical" />
+    </LinearLayout>
+  </android.support.v4.widget.SwipeRefreshLayout>
+</LinearLayout>

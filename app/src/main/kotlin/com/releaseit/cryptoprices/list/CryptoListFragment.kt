@@ -53,6 +53,14 @@ class CryptoListFragment : DaggerFragment() {
     cryptoListFragmentRecylerView.apply {
       layoutManager = LinearLayoutManager(context)
     }
+    cryptoListFragmentToolbar.inflateMenu(R.menu.menu_main)
+    cryptoListFragmentToolbar.setOnMenuItemClickListener {
+      if (it.itemId == R.id.menu_action_settings) {
+        navigator.navigateTo(Screen.Settings)
+        return@setOnMenuItemClickListener true
+      }
+      return@setOnMenuItemClickListener false
+    }
   }
 
   private fun renderState(state: State?) {

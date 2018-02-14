@@ -11,6 +11,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.releaseit.cryptoprices.R
+import com.releaseit.cryptoprices.navigation.Navigator
+import com.releaseit.cryptoprices.navigation.Screen
 import com.releaseit.cryptoprices.repository.Crypto
 import com.releaseit.cryptoprices.repository.CryptoRepository
 import com.releaseit.cryptoprices.utils.Prefs
@@ -47,6 +49,9 @@ class CryptoDetailsFragment : DaggerFragment() {
   @Inject
   lateinit var schedulerProvider: SchedulerProvider
 
+  @Inject
+  lateinit var navigator: Navigator
+
   private lateinit var viewModel: CryptoDetailsViewModel
 
   override fun onActivityCreated(savedInstanceState: Bundle?) {
@@ -69,10 +74,22 @@ class CryptoDetailsFragment : DaggerFragment() {
     cryptoDetailsFragmentRecylerView.apply {
       layoutManager = LinearLayoutManager(context)
     }
+    cryptoDetailsFragmentToolbar.setNavigationOnClickListener { navigator.navigateBack() }
+    cryptoDetailsFragmentToolbar.inflateMenu(R.menu.menu_main)
+    cryptoDetailsFragmentToolbar.setOnMenuItemClickListener {
+      if (it.itemId == R.id.menu_action_settings) {
+        navigator.navigateTo(Screen.Settings)
+        return@setOnMenuItemClickListener true
+      }
+      return@setOnMenuItemClickListener false
+    }
   }
 
   private fun renderState(state: State?) {
     if (state == null) return
+
+    // title
+    cryptoDetailsFragmentToolbar.title = state.crypto?.name ?: ""
 
     // show loading if needed
     if (cryptoDetailsFragmentSwipeRefreshLayout.isRefreshing != state.showLoading)
