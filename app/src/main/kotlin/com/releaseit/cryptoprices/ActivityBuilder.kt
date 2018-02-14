@@ -1,10 +1,10 @@
 package com.releaseit.cryptoprices
 
-import com.releaseit.cryptoprices.main.FragmentBuilder
 import com.releaseit.cryptoprices.main.MainActivity
-import com.releaseit.cryptoprices.main.MainActivityModule
+import com.releaseit.cryptoprices.main.di.FragmentBuilder
+import com.releaseit.cryptoprices.main.di.MainActivityModule
 import com.releaseit.cryptoprices.settings.SettingsActivity
-import com.releaseit.rxrepository.dagger2.qualifiers.PerActivity
+import com.releaseit.cryptoprices.utils.dagger2.scopes.PerActivity
 import dagger.Module
 import dagger.android.ContributesAndroidInjector
 
@@ -15,7 +15,7 @@ import dagger.android.ContributesAndroidInjector
 abstract class ActivityBuilder {
 
   @PerActivity
-  @ContributesAndroidInjector(modules = [MainActivityModule::class, FragmentBuilder::class])
+  @ContributesAndroidInjector(modules = [FragmentBuilder::class, MainActivityModule::class])
   abstract fun bindMainActivity(): MainActivity
 
   @PerActivity

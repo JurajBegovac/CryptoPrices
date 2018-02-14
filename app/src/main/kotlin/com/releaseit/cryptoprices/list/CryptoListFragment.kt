@@ -10,6 +10,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.releaseit.cryptoprices.R
+import com.releaseit.cryptoprices.navigation.Navigator
+import com.releaseit.cryptoprices.navigation.Screen
 import com.releaseit.cryptoprices.repository.Crypto
 import com.releaseit.cryptoprices.utils.inflate
 import com.releaseit.cryptoprices.utils.showToast
@@ -28,6 +30,9 @@ class CryptoListFragment : DaggerFragment() {
   @Inject
   lateinit var viewModelFactory: CryptoListViewModelFactory
 
+  @Inject
+  lateinit var navigator: Navigator
+
   private lateinit var viewModel: CryptoListViewModel
 
   override fun onActivityCreated(savedInstanceState: Bundle?) {
@@ -44,7 +49,7 @@ class CryptoListFragment : DaggerFragment() {
 
   override fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
-    cryptoListFragmentswipeRefreshLayout.setOnRefreshListener { viewModel.reloadData() }
+    cryptoListFragmentSwipeRefreshLayout.setOnRefreshListener { viewModel.reloadData() }
     cryptoListFragmentRecylerView.apply {
       layoutManager = LinearLayoutManager(context)
     }
@@ -54,14 +59,14 @@ class CryptoListFragment : DaggerFragment() {
     if (state == null) return
 
     // show loading if needed
-    if (cryptoListFragmentswipeRefreshLayout.isRefreshing != state.showLoading)
-      cryptoListFragmentswipeRefreshLayout.isRefreshing = state.showLoading
+    if (cryptoListFragmentSwipeRefreshLayout.isRefreshing != state.showLoading)
+      cryptoListFragmentSwipeRefreshLayout.isRefreshing = state.showLoading
 
     // show data
     cryptoListFragmentRecylerView.adapter = CryptoAdapter(
       { state.items[it].listItem },
       { state.items.count() },
-      { context.showToast("Item pressed at position: $it") })
+      { navigator.navigateTo(Screen.CryptoDetails(viewModel.itemId(it))) })
 
     // show error
     when (state.error) {

@@ -26,7 +26,7 @@ interface CryptoWebService {
    * Return just raw response because we have different currencies so we will parse it depending on currency
    */
   @GET("ticker/{id}")
-  fun getCrypto(@Path("id") id: String, @Query("convert") convert: String): Single<CryptoResponse>
+  fun getCrypto(@Path("id") id: String, @Query("convert") convert: String): Single<List<CryptoResponse>>
 }
 
 data class CryptoResponse(

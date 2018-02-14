@@ -12,4 +12,16 @@
   <string name="error_unknown">Something went wrong. Please try again later.</string>
   <string name="settings_select_currency">Select currency</string>
   <string name="settings_title">Settings</string>
+  <string name="crypto_detail_name">Name</string>
+  <string name="crypto_detail_rank">Rank</string>
+  <string name="crypto_detail_symbol">Symbol</string>
+  <string name="crypto_detail_price">Price</string>
+  <string name="crypto_detail_24h_volume">24h volume</string>
+  <string name="crypto_detail_market_cap">Market cap</string>
+  <string name="crypto_detail_price_btc">Price in BTC</string>
+  <string name="crypto_detail_1h_change">1h change</string>
+  <string name="crypto_detail_24h_change">24h change</string>
+  <string name="crypto_detail_7d_change">7d change</string>
+  <string name="crypto_detail_total_supply">Total supply</string>
+  <string name="crypto_detail_available_supply">Available supply</string>
 </resources>

@@ -24,7 +24,8 @@ data class Crypto(val id: String,
                   val percentChange7d: String,
                   val availableSupply: String,
                   val totalSupply: String,
-                  val currency: Currency)
+                  val currency: Currency,
+                  val marketCap: String)
 
 enum class Currency {
   USD, EUR, CNY

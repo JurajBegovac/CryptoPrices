@@ -15,7 +15,7 @@ class WebCryptoRepository(private val webService: CryptoWebService) : CryptoRepo
 
   override fun getCrypto(id: String, currency: Currency): Single<Crypto> =
     webService.getCrypto(id, currency.name)
-      .map { fromResponseToCrypto(it, currency) }
+      .map { fromResponseToCrypto(it.first(), currency) }
 
   /**
    * Convert from web response to crypto depending on currency
@@ -31,6 +31,11 @@ class WebCryptoRepository(private val webService: CryptoWebService) : CryptoRepo
                       Currency.EUR -> cryptoResponse._24hVolumeEur
                       Currency.CNY -> cryptoResponse._24hVolumeCny
                     } ?: ""
+    val marketCap = when (currency) {
+                      Currency.USD -> cryptoResponse.marketCapUsd
+                      Currency.EUR -> cryptoResponse.marketCapEur
+                      Currency.CNY -> cryptoResponse.marketCapCny
+                    } ?: ""
     return Crypto(cryptoResponse.id,
                   cryptoResponse.name,
                   cryptoResponse.rank,
@@ -43,6 +48,7 @@ class WebCryptoRepository(private val webService: CryptoWebService) : CryptoRepo
                   cryptoResponse.percentChange7d ?: "",
                   cryptoResponse.availableSupply ?: "",
                   cryptoResponse.totalSupply ?: "",
-                  currency)
+                  currency,
+                  marketCap)
   }
 }

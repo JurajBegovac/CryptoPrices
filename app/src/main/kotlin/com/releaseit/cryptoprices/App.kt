@@ -7,7 +7,7 @@ import com.releaseit.cryptoprices.repository.CryptoRepository
 import com.releaseit.cryptoprices.repository.WebCryptoRepository
 import com.releaseit.cryptoprices.web.CryptoWebService
 import com.releaseit.cryptoprices.web.WebModule
-import com.releaseit.rxrepository.dagger2.qualifiers.ApplicationContext
+import com.releaseit.cryptoprices.utils.dagger2.qualifiers.ApplicationContext
 import dagger.BindsInstance
 import dagger.Component
 import dagger.Module

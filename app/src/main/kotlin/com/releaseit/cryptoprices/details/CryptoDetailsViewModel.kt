@@ -1,4 +1,4 @@
-package com.releaseit.cryptoprices.list
+package com.releaseit.cryptoprices.details
 
 import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.ViewModel
@@ -14,30 +14,26 @@ import io.reactivex.schedulers.Schedulers
 import java.net.UnknownHostException
 
 /**
- * Created by jurajbegovac on 12/02/2018.
+ * Created by jurajbegovac on 13/02/2018.
  */
 
-data class State(val items: List<Crypto>, val error: StateError?, val showLoading: Boolean) {
-  companion object {
-    fun initial() = State(emptyList(), null, true)
-  }
-}
+data class State(val crypto: Crypto?, val error: StateError?, val showLoading: Boolean)
 
 sealed class StateError {
   object NoInternet : StateError()
   object Unknown : StateError()
 }
 
-class CryptoListViewModel(private val repository: CryptoRepository,
-                          private val sharedPreferences: SharedPreferences) : ViewModel() {
+class CryptoDetailsViewModel(private val id: String,
+                             private val repository: CryptoRepository,
+                             private val sharedPreferences: SharedPreferences) : ViewModel() {
 
   private val compositeDisposable = CompositeDisposable()
 
   val state = MutableLiveData<State>()
 
   init {
-    state.value = State.initial()
-    compositeDisposable.addAll(loadCryptosDisposable(), currencyDisposable())
+    compositeDisposable.addAll(loadCryptoDisposable(), currencyDisposable())
   }
 
   override fun onCleared() {
@@ -45,18 +41,19 @@ class CryptoListViewModel(private val repository: CryptoRepository,
     super.onCleared()
   }
 
-  private fun loadCryptosDisposable() =
-    repository.getCryptos(sharedPreferences.currency(), "100")
+  private fun loadCryptoDisposable() =
+    repository.getCrypto(id, sharedPreferences.currency())
       .subscribeOn(Schedulers.io())
       .observeOn(AndroidSchedulers.mainThread())
       .subscribe({ success, error ->
                    if (success != null) {
                      state.value = State(success, null, false)
                    } else if (error != null) {
-                     val currentState = state.value ?: State.initial()
+                     val currentState = state.value
                      val stateError =
                        if (error is UnknownHostException) StateError.NoInternet else StateError.Unknown
-                     state.value = currentState.copy(error = stateError, showLoading = false)
+                     state.value = currentState?.copy(error = stateError, showLoading = false) ?:
+                       State(null, stateError, false)
                    }
                  })
 
@@ -67,20 +64,19 @@ class CryptoListViewModel(private val repository: CryptoRepository,
    */
   fun reloadData() {
     // show loading
-    state.value = state.value?.copy(showLoading = true) ?: State.initial().copy(showLoading = true)
+    state.value = state.value?.copy(showLoading = true) ?: State(null, null, true)
     // make new query
-    compositeDisposable.add(loadCryptosDisposable())
+    compositeDisposable.add(loadCryptoDisposable())
   }
-
-  fun itemId(position: Int) = state.value!!.items[position].id
 
 }
 
-class CryptoListViewModelFactory(private val repository: CryptoRepository,
-                                 private val sharedPreferences: SharedPreferences) : ViewModelProvider.Factory {
+class CryptoDetailsViewModelFactory(private val id: String,
+                                    private val repository: CryptoRepository,
+                                    private val sharedPreferences: SharedPreferences) : ViewModelProvider.Factory {
   override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-    if (modelClass.isAssignableFrom(CryptoListViewModel::class.java)) {
-      return CryptoListViewModel(repository, sharedPreferences) as T
+    if (modelClass.isAssignableFrom(CryptoDetailsViewModel::class.java)) {
+      return CryptoDetailsViewModel(id, repository, sharedPreferences) as T
     }
     throw IllegalArgumentException("Unknown ViewModel class")
   }

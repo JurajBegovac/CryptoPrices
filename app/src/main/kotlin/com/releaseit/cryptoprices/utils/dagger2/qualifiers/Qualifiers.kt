@@ -1,4 +1,4 @@
-package com.releaseit.rxrepository.dagger2.qualifiers
+package com.releaseit.cryptoprices.utils.dagger2.qualifiers
 
 import javax.inject.Qualifier
 
