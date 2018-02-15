@@ -44,7 +44,7 @@ class CryptoListViewModel(private val repository: CryptoRepository,
   }
 
   private fun loadCryptosDisposable() =
-    repository.getCryptos(prefs.currency, "100")
+    repository.getCryptos(prefs.currency, "${CryptoRepository.LIMIT}")
       .subscribeOn(schedulerProvider.io())
       .observeOn(schedulerProvider.main())
       .subscribe({ success, error ->

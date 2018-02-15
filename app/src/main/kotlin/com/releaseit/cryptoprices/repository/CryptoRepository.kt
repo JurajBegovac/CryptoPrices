@@ -10,6 +10,11 @@ interface CryptoRepository {
   fun getCryptos(currency: Currency, limit: String): Single<List<Crypto>>
 
   fun getCrypto(id: String, currency: Currency): Single<Crypto>
+
+  companion object {
+    // hardcoded limit
+    const val LIMIT = 100
+  }
 }
 
 data class Crypto(val id: String,
