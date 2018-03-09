@@ -97,6 +97,9 @@ dependencies {
     // rx preferences
     implementation 'com.f2prateek.rx.preferences2:rx-preferences:' + versions.rx_preferences
 
+
+    // rx feedback - rx redux
+	implementation 'com.github.NoTests:RxFeedback.kt:0.1.2'
     // testing
     testImplementation 'junit:junit:' + versions.junit
     testImplementation 'org.mockito:mockito-core:' + versions.mockito
