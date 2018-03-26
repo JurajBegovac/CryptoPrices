@@ -1,8 +1,3 @@
-/*
- * Copyright © 2014-2018, TWINT AG.
- * All rights reserved.
- */
-
 package com.releaseit.cryptoprices.details
 
 import com.releaseit.cryptoprices.repository.CryptoRepository
