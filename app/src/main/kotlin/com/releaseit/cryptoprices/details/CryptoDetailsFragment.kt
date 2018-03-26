@@ -14,9 +14,6 @@ import com.releaseit.cryptoprices.R
 import com.releaseit.cryptoprices.navigation.Navigator
 import com.releaseit.cryptoprices.navigation.Screen
 import com.releaseit.cryptoprices.repository.Crypto
-import com.releaseit.cryptoprices.repository.CryptoRepository
-import com.releaseit.cryptoprices.utils.Prefs
-import com.releaseit.cryptoprices.utils.SchedulerProvider
 import com.releaseit.cryptoprices.utils.inflate
 import com.releaseit.cryptoprices.utils.showToast
 import dagger.android.support.DaggerFragment
@@ -29,103 +26,95 @@ import javax.inject.Inject
  */
 class CryptoDetailsFragment : DaggerFragment() {
 
-  companion object {
-    const val KEY_ID = "key:id"
-    fun newInstance(id: String): Fragment {
-      val cryptoDetailsFragment = CryptoDetailsFragment()
-      val bundle = Bundle()
-      bundle.putString(KEY_ID, id)
-      cryptoDetailsFragment.arguments = bundle
-      return cryptoDetailsFragment
-    }
-  }
-
-  @Inject
-  lateinit var repository: CryptoRepository
-
-  @Inject
-  lateinit var prefs: Prefs
-
-  @Inject
-  lateinit var schedulerProvider: SchedulerProvider
-
-  @Inject
-  lateinit var navigator: Navigator
-
-  private lateinit var viewModel: CryptoDetailsViewModel
-
-  override fun onActivityCreated(savedInstanceState: Bundle?) {
-    super.onActivityCreated(savedInstanceState)
-    viewModel =
-      ViewModelProviders.of(this,
-                            CryptoDetailsViewModelFactory(arguments.getString(KEY_ID)!!, repository,
-                                                          prefs, schedulerProvider))
-        .get(CryptoDetailsViewModel::class.java)
-    viewModel.state.observe(this, Observer<State> { renderState(it) })
-  }
-
-  override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-    return inflater.inflate(R.layout.fragment_crypto_details, container, false)
-  }
-
-  override fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
-    super.onViewCreated(view, savedInstanceState)
-    cryptoDetailsFragmentSwipeRefreshLayout.setOnRefreshListener { viewModel.reloadData() }
-    cryptoDetailsFragmentRecylerView.apply {
-      layoutManager = LinearLayoutManager(context)
-    }
-    cryptoDetailsFragmentToolbar.setNavigationOnClickListener { navigator.navigateBack() }
-    cryptoDetailsFragmentToolbar.inflateMenu(R.menu.menu_main)
-    cryptoDetailsFragmentToolbar.setOnMenuItemClickListener {
-      if (it.itemId == R.id.menu_action_settings) {
-        navigator.navigateTo(Screen.Settings)
-        return@setOnMenuItemClickListener true
-      }
-      return@setOnMenuItemClickListener false
-    }
-  }
-
-  private fun renderState(state: State?) {
-    if (state == null) return
-
-    // title
-    cryptoDetailsFragmentToolbar.title = state.crypto?.name ?: ""
-
-    // show loading if needed
-    if (cryptoDetailsFragmentSwipeRefreshLayout.isRefreshing != state.showLoading)
-      cryptoDetailsFragmentSwipeRefreshLayout.isRefreshing = state.showLoading
-
-    // show data
-    val crypto = state.crypto
-    if (crypto != null) {
-      cryptoDetailsFragmentRecylerView.adapter = CryptoAdapter(crypto.detailItems)
+    companion object {
+        const val KEY_ID = "key:id"
+        fun newInstance(id: String): Fragment {
+            val cryptoDetailsFragment = CryptoDetailsFragment()
+            val bundle = Bundle()
+            bundle.putString(KEY_ID, id)
+            cryptoDetailsFragment.arguments = bundle
+            return cryptoDetailsFragment
+        }
     }
 
-    // show error
-    when (state.error) {
-      StateError.NoInternet -> context.showToast(R.string.error_no_internet)
-      StateError.Unknown    -> context.showToast(R.string.error_unknown)
+    @Inject
+    lateinit var navigator: Navigator
+
+    @Inject
+    lateinit var viewModelFactory: CryptoDetailsViewModelFactory
+
+    private lateinit var viewModel: CryptoDetailsViewModel
+
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+        super.onActivityCreated(savedInstanceState)
+        viewModel =
+                ViewModelProviders.of(this, viewModelFactory)
+                        .get(CryptoDetailsViewModel::class.java)
+        viewModel.state.observe(this, Observer<State> { renderState(it) })
     }
-  }
+
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        return inflater.inflate(R.layout.fragment_crypto_details, container, false)
+    }
+
+    override fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        cryptoDetailsFragmentSwipeRefreshLayout.setOnRefreshListener { viewModel.reloadData() }
+        cryptoDetailsFragmentRecylerView.apply {
+            layoutManager = LinearLayoutManager(context)
+        }
+        cryptoDetailsFragmentToolbar.setNavigationOnClickListener { navigator.navigateBack() }
+        cryptoDetailsFragmentToolbar.inflateMenu(R.menu.menu_main)
+        cryptoDetailsFragmentToolbar.setOnMenuItemClickListener {
+            if (it.itemId == R.id.menu_action_settings) {
+                navigator.navigateTo(Screen.Settings)
+                return@setOnMenuItemClickListener true
+            }
+            return@setOnMenuItemClickListener false
+        }
+    }
+
+    private fun renderState(state: State?) {
+        if (state == null) return
+
+        // title
+        cryptoDetailsFragmentToolbar.title = state.crypto?.name ?: ""
+
+        // show loading if needed
+        if (cryptoDetailsFragmentSwipeRefreshLayout.isRefreshing != state.showLoading)
+            cryptoDetailsFragmentSwipeRefreshLayout.isRefreshing = state.showLoading
+
+        // show data
+        val crypto = state.crypto
+        if (crypto != null) {
+            cryptoDetailsFragmentRecylerView.adapter = CryptoAdapter(crypto.detailItems)
+        }
+
+        // show error
+        when (state.error) {
+            StateError.NoInternet -> context.showToast(R.string.error_no_internet)
+            StateError.Unknown -> context.showToast(R.string.error_unknown)
+        }
+    }
 }
 
 /**
  * Mapper from Crypto to CryptoListItem
  */
 internal val Crypto.detailItems: List<CryptoDetailItem>
-  get() = listOf(
-    CryptoDetailItem(R.string.crypto_detail_name, name),
-    CryptoDetailItem(R.string.crypto_detail_rank, rank),
-    CryptoDetailItem(R.string.crypto_detail_symbol, symbol),
-    CryptoDetailItem(R.string.crypto_detail_price, "$price $currency"),
-    CryptoDetailItem(R.string.crypto_detail_24h_volume, "$_24hVolume $currency"),
-    CryptoDetailItem(R.string.crypto_detail_market_cap, "$marketCap $currency"),
-    CryptoDetailItem(R.string.crypto_detail_price_btc, priceBtc),
-    CryptoDetailItem(R.string.crypto_detail_1h_change, "$percentChange1h%"),
-    CryptoDetailItem(R.string.crypto_detail_24h_change, "$percentChange24h%"),
-    CryptoDetailItem(R.string.crypto_detail_7d_change, "$percentChange7d%"),
-    CryptoDetailItem(R.string.crypto_detail_total_supply, totalSupply),
-    CryptoDetailItem(R.string.crypto_detail_available_supply, availableSupply))
+    get() = listOf(
+            CryptoDetailItem(R.string.crypto_detail_name, name),
+            CryptoDetailItem(R.string.crypto_detail_rank, rank),
+            CryptoDetailItem(R.string.crypto_detail_symbol, symbol),
+            CryptoDetailItem(R.string.crypto_detail_price, "$price $currency"),
+            CryptoDetailItem(R.string.crypto_detail_24h_volume, "$_24hVolume $currency"),
+            CryptoDetailItem(R.string.crypto_detail_market_cap, "$marketCap $currency"),
+            CryptoDetailItem(R.string.crypto_detail_price_btc, priceBtc),
+            CryptoDetailItem(R.string.crypto_detail_1h_change, "$percentChange1h%"),
+            CryptoDetailItem(R.string.crypto_detail_24h_change, "$percentChange24h%"),
+            CryptoDetailItem(R.string.crypto_detail_7d_change, "$percentChange7d%"),
+            CryptoDetailItem(R.string.crypto_detail_total_supply, totalSupply),
+            CryptoDetailItem(R.string.crypto_detail_available_supply, availableSupply))
 
 /**
  * List item
@@ -136,21 +125,21 @@ data class CryptoDetailItem(@StringRes val nameResId: Int, val value: String)
  * Recyclerview adapter
  */
 internal class CryptoAdapter(private val items: List<CryptoDetailItem>)
-  : RecyclerView.Adapter<CryptoDetailsViewHolder>() {
+    : RecyclerView.Adapter<CryptoDetailsViewHolder>() {
 
-  override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) =
-    CryptoDetailsViewHolder(parent.inflate(R.layout.item_crypto_details))
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) =
+            CryptoDetailsViewHolder(parent.inflate(R.layout.item_crypto_details))
 
-  override fun getItemCount() = items.count()
+    override fun getItemCount() = items.count()
 
-  override fun onBindViewHolder(holder: CryptoDetailsViewHolder?, position: Int) {
-    holder?.bind(items[position])
-  }
+    override fun onBindViewHolder(holder: CryptoDetailsViewHolder?, position: Int) {
+        holder?.bind(items[position])
+    }
 }
 
 internal class CryptoDetailsViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-  fun bind(item: CryptoDetailItem) {
-    itemView.itemCryptoDetailName.setText(item.nameResId)
-    itemView.itemCryptoDetailValue.text = item.value
-  }
+    fun bind(item: CryptoDetailItem) {
+        itemView.itemCryptoDetailName.setText(item.nameResId)
+        itemView.itemCryptoDetailValue.text = item.value
+    }
 }
