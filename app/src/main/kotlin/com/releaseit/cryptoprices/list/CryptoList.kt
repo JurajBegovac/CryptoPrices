@@ -16,11 +16,8 @@ import com.releaseit.cryptoprices.navigation.Screen
 import com.releaseit.cryptoprices.repository.Crypto
 import com.releaseit.cryptoprices.repository.CryptoRepository
 import com.releaseit.cryptoprices.repository.Currency
-import com.releaseit.cryptoprices.utils.Prefs
-import com.releaseit.cryptoprices.utils.RxFeedbackViewModel
+import com.releaseit.cryptoprices.utils.*
 import com.releaseit.cryptoprices.utils.dagger2.scopes.PerFragment
-import com.releaseit.cryptoprices.utils.inflate
-import com.releaseit.cryptoprices.utils.showToast
 import dagger.Module
 import dagger.Provides
 import dagger.android.support.DaggerFragment
@@ -49,10 +46,9 @@ class CryptoListFragmentModule {
 /**
  * STATE
  */
-data class State(val items: List<Crypto>, val error: StateError?, val loading: Boolean, val currency: Currency,
-                 val selectedItem: Crypto?) {
+data class State(val items: List<Crypto>, val error: Optional<StateError>, val loading: Boolean, val currency: Currency) {
     companion object {
-        fun initial() = State(emptyList(), null, true, Currency.USD, null)
+        fun initial() = State(emptyList(), Optional.None(), true, Currency.USD)
     }
 }
 
@@ -63,8 +59,6 @@ sealed class Event {
     data class DataLoaded(val items: List<Crypto>) : Event()
     data class Error(val error: StateError) : Event()
     data class CurrencyChanged(val currency: Currency) : Event()
-    data class ItemSelected(val position: Int) : Event()
-    object ItemDeselected : Event()
     object ReloadData : Event()
 }
 
@@ -73,12 +67,10 @@ sealed class Event {
  */
 fun State.Companion.reduce(state: State, event: Event) =
         when (event) {
-            is Event.DataLoaded -> state.copy(items = event.items, error = null, loading = false, selectedItem = null)
-            is Event.Error -> state.copy(error = event.error, loading = false)
+            is Event.DataLoaded -> state.copy(items = event.items, error = Optional.None(), loading = false)
+            is Event.Error -> state.copy(error = Optional.Some(event.error), loading = false)
             is Event.CurrencyChanged -> state.copy(currency = event.currency, loading = true)
-            Event.ReloadData -> state.copy(loading = true)
-            is Event.ItemSelected -> state.copy(selectedItem = state.items[event.position])
-            Event.ItemDeselected -> if (state.selectedItem == null) state else state.copy(selectedItem = null)
+            Event.ReloadData -> state.copy(loading = true, error = Optional.None())
         }
 
 /**
@@ -93,7 +85,7 @@ sealed class StateError {
  * FEEDBACKS
  */
 
-internal val CryptoRepository.feedback: SignalFeedback<State, Event>
+private val CryptoRepository.feedback: SignalFeedback<State, Event>
     get() = reactSafe<State, Currency, Event>(
             query = {
                 if (it.loading) return@reactSafe Optional.Some(it.currency)
@@ -104,12 +96,12 @@ internal val CryptoRepository.feedback: SignalFeedback<State, Event>
                         .toObservable()
                         .map<Event> { Event.DataLoaded(it) }
                         .asSignal<Event> {
-                            if (it is UnknownHostException) return@asSignal org.notests.sharedsequence.Signal.just(Event.Error(StateError.NoInternet))
-                            return@asSignal org.notests.sharedsequence.Signal.just(Event.Error(StateError.Unknown))
+                            if (it is UnknownHostException) return@asSignal Signal.just(Event.Error(StateError.NoInternet))
+                            return@asSignal Signal.just(Event.Error(StateError.Unknown))
                         }
             })
 
-internal val Prefs.feedback: SignalFeedback<State, Event>
+private val Prefs.feedback: SignalFeedback<State, Event>
     get() = {
         this.currencyObservable
                 .map<Event> { Event.CurrencyChanged(it) }
@@ -180,11 +172,7 @@ class CryptoListFragment : DaggerFragment() {
 
     override fun onStart() {
         super.onStart()
-        disposable.addAll(itemsDisposable(),
-                loadingDisposable(),
-                errorDisposable(),
-                itemSelectedDisposable()
-        )
+        disposable.addAll(itemsDisposable(), loadingDisposable(), errorDisposable())
     }
 
     override fun onStop() {
@@ -200,7 +188,7 @@ class CryptoListFragment : DaggerFragment() {
                         cryptoListFragmentRecylerView.adapter = CryptoAdapter(
                                 { items[it].listItem },
                                 { items.count() },
-                                { viewModel.event(Event.ItemSelected(it)) })
+                                { navigator.navigateTo(Screen.CryptoDetails(items[it].id)) })
                     }
 
     private fun loadingDisposable() =
@@ -212,37 +200,21 @@ class CryptoListFragment : DaggerFragment() {
 
     private fun errorDisposable() =
             viewModel.state
-                    .map {
-                        if (it.error == null) return@map Optional.None<StateError>()
-                        return@map Optional.Some(it.error)
-                    }
+                    .map { it.error }
                     .filter { it !is Optional.None }
-                    .map { (it as Optional.Some).data }
+                    .cast(Optional.Some::class.java)
                     .drive {
-                        when (it) {
+                        when (it.data) {
                             StateError.NoInternet -> context.showToast(R.string.error_no_internet)
                             StateError.Unknown -> context.showToast(R.string.error_unknown)
                         }
-                    }
-
-    private fun itemSelectedDisposable() =
-            viewModel.state
-                    .map {
-                        if (it.selectedItem == null) return@map Optional.None<Crypto>()
-                        return@map Optional.Some(it.selectedItem)
-                    }
-                    .filter { it !is Optional.None }
-                    .map { (it as Optional.Some).data }
-                    .drive {
-                        viewModel.event(Event.ItemDeselected)
-                        navigator.navigateTo(Screen.CryptoDetails(it.id))
                     }
 }
 
 /**
  * Mapper from Crypto to CryptoListItem
  */
-internal val Crypto.listItem: CryptoListItem
+private val Crypto.listItem: CryptoListItem
     get() = CryptoListItem(rank, symbol, "$price ${currency.name}", "$percentChange24h%")
 
 /**
@@ -253,8 +225,8 @@ data class CryptoListItem(val rank: String, val symbol: String, val price: Strin
 /**
  * Recyclerview adapter
  */
-internal class CryptoAdapter(private val itemProvider: (Int) -> CryptoListItem, private val itemCount: () -> Int,
-                             private val clickListener: (Int) -> (Unit))
+private class CryptoAdapter(private val itemProvider: (Int) -> CryptoListItem, private val itemCount: () -> Int,
+                            private val clickListener: (Int) -> (Unit))
     : RecyclerView.Adapter<CryptoViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) =
@@ -267,7 +239,7 @@ internal class CryptoAdapter(private val itemProvider: (Int) -> CryptoListItem, 
     }
 }
 
-internal class CryptoViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+private class CryptoViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
     fun bind(item: CryptoListItem, clickListener: () -> Unit) {
         itemView.itemCryptoRoot.setOnClickListener { clickListener() }
         itemView.itemCryptoRank.text = item.rank
