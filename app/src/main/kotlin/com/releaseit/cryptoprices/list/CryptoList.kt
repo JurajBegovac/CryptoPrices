@@ -1,7 +1,5 @@
 package com.releaseit.cryptoprices.list
 
-import android.arch.lifecycle.ViewModel
-import android.arch.lifecycle.ViewModelProvider
 import android.arch.lifecycle.ViewModelProviders
 import android.os.Bundle
 import android.support.v4.app.Fragment
@@ -18,6 +16,7 @@ import com.releaseit.cryptoprices.repository.CryptoRepository
 import com.releaseit.cryptoprices.repository.Currency
 import com.releaseit.cryptoprices.utils.Prefs
 import com.releaseit.cryptoprices.utils.RxFeedbackViewModel
+import com.releaseit.cryptoprices.utils.RxFeedbackViewModelFactory
 import com.releaseit.cryptoprices.utils.cast
 import com.releaseit.cryptoprices.utils.dagger2.scopes.PerFragment
 import com.releaseit.cryptoprices.utils.inflate
@@ -40,18 +39,6 @@ import org.notests.sharedsequence.just
 import org.notests.sharedsequence.map
 import java.net.UnknownHostException
 import javax.inject.Inject
-
-/**
- * DI - dagger
- */
-@Module
-class CryptoListFragmentModule {
-
-  @Provides
-  @PerFragment
-  fun cryptoListViewModelFactory(cryptoRepository: CryptoRepository, prefs: Prefs) =
-    CryptoListViewModelFactory(cryptoRepository, prefs)
-}
 
 /**
  * STATE
@@ -122,23 +109,27 @@ private val Prefs.feedback: SignalFeedback<State, Event>
   }
 
 /**
+ * DI - dagger
+ */
+@Module
+class CryptoListFragmentModule {
+
+  @Provides
+  @PerFragment
+  fun cryptoListViewModelFactory(cryptoRepository: CryptoRepository,
+                                 prefs: Prefs): RxFeedbackViewModelFactory<State, Event> =
+    RxFeedbackViewModelFactory(State.initial(),
+                               { s, e -> State.reduce(s, e) },
+                               listOf(cryptoRepository.feedback, prefs.feedback))
+}
+
+/**
  * VIEW MODEL STUFF
  */
 
-class CryptoListViewModelFactory(private val repository: CryptoRepository,
-                                 private val prefs: Prefs) : ViewModelProvider.Factory {
-  override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-    if (modelClass.isAssignableFrom(CryptoListViewModel::class.java)) {
-      return CryptoListViewModel(repository, prefs) as T
-    }
-    throw IllegalArgumentException("Unknown ViewModel class")
-  }
-}
+private typealias CryptoListViewModel = RxFeedbackViewModel<State, Event>
 
-class CryptoListViewModel(repository: CryptoRepository, prefs: Prefs) :
-  RxFeedbackViewModel<State, Event>(State.initial(),
-                                    { s, e -> State.reduce(s, e) },
-                                    listOf(repository.feedback, prefs.feedback))
+private typealias CryptoListViewModelFactory = RxFeedbackViewModelFactory<State, Event>
 
 /**
  * VIEW STUFF - Fragment
@@ -164,12 +155,11 @@ class CryptoListFragment : DaggerFragment() {
     super.onActivityCreated(savedInstanceState)
     viewModel =
       ViewModelProviders.of(this, viewModelFactory)
-        .get(CryptoListViewModel::class.java)
+        .get(RxFeedbackViewModel::class.java) as CryptoListViewModel
   }
 
-  override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-    return inflater.inflate(R.layout.fragment_crypto_list, container, false)
-  }
+  override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?) =
+    inflater.inflate(R.layout.fragment_crypto_list, container, false)
 
   override fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
