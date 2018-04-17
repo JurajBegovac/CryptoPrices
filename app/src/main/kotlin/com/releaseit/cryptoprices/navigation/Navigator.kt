@@ -10,33 +10,34 @@ import android.support.v4.app.FragmentActivity
  * Navigator
  */
 interface Navigator {
-    companion object {}
+  companion object
 
-    fun navigateTo(screen: Screen)
-    fun navigateBack()
+  fun navigateTo(screen: Screen)
+  fun navigateBack()
 }
 
 /**
  * Screens
  */
 sealed class Screen {
-    object CryptoList : Screen()
-    data class CryptoDetails(val id: String) : Screen()
-    object Settings : Screen()
+  object CryptoList : Screen()
+  data class CryptoDetails(val id: String) : Screen()
+  object Settings : Screen()
 }
 
 /**
  * Extensions (helpers)
  */
-fun Navigator.Companion.showFragmentWithBackStack(activity: FragmentActivity, fragment: Fragment, @IdRes container: Int) {
-    activity.supportFragmentManager.beginTransaction()
-            .addToBackStack(null)
-            .replace(container, fragment)
-            .commit()
+fun Navigator.Companion.showFragmentWithBackStack(activity: FragmentActivity,
+                                                  fragment: Fragment, @IdRes container: Int) {
+  activity.supportFragmentManager.beginTransaction()
+    .addToBackStack(null)
+    .replace(container, fragment)
+    .commit()
 }
 
 fun Navigator.Companion.showFragment(activity: FragmentActivity, fragment: Fragment, @IdRes container: Int) {
-    activity.supportFragmentManager.beginTransaction()
-            .replace(container, fragment)
-            .commit()
+  activity.supportFragmentManager.beginTransaction()
+    .replace(container, fragment)
+    .commit()
 }
