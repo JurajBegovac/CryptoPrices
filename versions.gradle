@@ -5,7 +5,7 @@
 ext.versions = [:]
 
 def versions = [:]
-versions.kotlin = '1.2.21'
+versions.kotlin = '1.2.31'
 versions.support = '26.1.0'
 versions.constraint_layout = '1.0.2'
 versions.retrofit = '2.3.0'
