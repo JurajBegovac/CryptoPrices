@@ -23,24 +23,25 @@ fun SharedPreferences.saveCurrency(currency: Currency) = edit().putString(KEY_CU
 // rx
 fun SharedPreferences.rx() = RxSharedPreferences.create(this)
 
-fun SharedPreferences.currencyObservable() = rx().getString(KEY_CURRENCY, Currency.USD.name)
-        .asObservable().map { Currency.valueOf(it) }
+fun RxSharedPreferences.currencyObservable(): Observable<Currency> =
+  getString(KEY_CURRENCY, Currency.USD.name).asObservable().map { Currency.valueOf(it) }
 
 interface Prefs {
-    var currency: Currency
-    val currencyObservable: Observable<Currency>
+  var currency: Currency
+  val currencyObservable: Observable<Currency>
 }
 
 @Singleton
 class DefaultPrefs @Inject constructor(@ApplicationContext context: Context) : Prefs {
 
-    private val sharedPreferences = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
+  private val sharedPreferences = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
+  private val rxSharedPreferences = sharedPreferences.rx()
 
-    override var currency: Currency
-        get() = sharedPreferences.currency()
-        set(value) {
-            sharedPreferences.saveCurrency(value)
-        }
-    override val currencyObservable: Observable<Currency>
-        get() = sharedPreferences.currencyObservable()
+  override var currency: Currency
+    get() = sharedPreferences.currency()
+    set(value) {
+      sharedPreferences.saveCurrency(value)
+    }
+  override val currencyObservable: Observable<Currency>
+    get() = rxSharedPreferences.currencyObservable()
 }

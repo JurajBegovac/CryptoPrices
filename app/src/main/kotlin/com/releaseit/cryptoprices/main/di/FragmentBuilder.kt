@@ -1,7 +1,7 @@
 package com.releaseit.cryptoprices.main.di
 
+import com.releaseit.cryptoprices.details.CryptoDetailsModule
 import com.releaseit.cryptoprices.details.CryptoDetailsFragment
-import com.releaseit.cryptoprices.details.CryptoDetailsFragmentModule
 import com.releaseit.cryptoprices.list.CryptoListFragment
 import com.releaseit.cryptoprices.list.CryptoListFragmentModule
 import com.releaseit.cryptoprices.utils.dagger2.scopes.PerFragment
@@ -19,7 +19,7 @@ abstract class FragmentBuilder {
   abstract fun cryptoListFragment(): CryptoListFragment
 
   @PerFragment
-  @ContributesAndroidInjector(modules = [CryptoDetailsFragmentModule::class])
+  @ContributesAndroidInjector(modules = [CryptoDetailsModule::class])
   abstract fun cryptoDetailsFragment(): CryptoDetailsFragment
 
 }

@@ -108,6 +108,7 @@ private val Prefs.feedback: SignalFeedback<State, Event>
       .asSignal { Signal.just(Event.Error(StateError.Unknown)) }
   }
 
+
 /**
  * DI - dagger
  */
@@ -161,7 +162,7 @@ class CryptoListFragment : DaggerFragment() {
   override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?) =
     inflater.inflate(R.layout.fragment_crypto_list, container, false)
 
-  override fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
+  override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
     cryptoListFragmentSwipeRefreshLayout.setOnRefreshListener { viewModel.event(Event.ReloadData) }
     cryptoListFragmentRecylerView.apply {
@@ -212,8 +213,8 @@ class CryptoListFragment : DaggerFragment() {
       .cast(Optional.Some::class.java)
       .drive {
         when (it.data) {
-          StateError.NoInternet -> context.showToast(R.string.error_no_internet)
-          StateError.Unknown    -> context.showToast(R.string.error_unknown)
+          StateError.NoInternet -> context?.showToast(R.string.error_no_internet)
+          StateError.Unknown    -> context?.showToast(R.string.error_unknown)
         }
       }
 }
@@ -241,8 +242,8 @@ private class CryptoAdapter(private val itemProvider: (Int) -> CryptoListItem, p
 
   override fun getItemCount() = itemCount()
 
-  override fun onBindViewHolder(holder: CryptoViewHolder?, position: Int) {
-    holder?.bind(itemProvider(position), { clickListener(position) })
+  override fun onBindViewHolder(holder: CryptoViewHolder, position: Int) {
+    holder.bind(itemProvider(position), { clickListener(position) })
   }
 }
 

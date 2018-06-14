@@ -18,9 +18,9 @@ import org.notests.sharedsequence.empty
  */
 
 class RxFeedbackViewModel<State, in Event>(
-  initialState: State,
-  reducer: (State, Event) -> State,
-  feedbacks: Iterable<SignalFeedback<State, Event>>) : ViewModel() {
+  private val initialState: State,
+  private val reducer: (State, Event) -> State,
+  private val feedbacks: Iterable<SignalFeedback<State, Event>>) : ViewModel() {
 
   val state: Driver<State> =
     Driver.system(initialState, reducer, feedbacks.plus { uiEvents.asSignal { Signal.empty() } })
@@ -54,4 +54,8 @@ class RxFeedbackViewModelFactory<State, Event>(
     }
     throw IllegalArgumentException("Unknown ViewModel class")
   }
+}
+
+interface RxFeedbackView<Event> {
+  fun events(): Iterable<Signal<Event>>
 }
