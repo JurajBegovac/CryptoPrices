@@ -92,7 +92,7 @@ complexity:
     threshold: 20
   LongParameterList:
     active: true
-    threshold: 5
+    threshold: 6
     ignoreDefaultParameters: false
   MethodOverloading:
     active: false
@@ -339,7 +339,7 @@ style:
     active: false
   ReturnCount:
     active: true
-    max: 2
+    max: 10
     excludedFunctions: "equals"
   SafeCast:
     active: true

@@ -11,48 +11,51 @@ import javax.inject.Singleton
  */
 @Singleton
 class WebCryptoRepository @Inject constructor(private val webService: CryptoWebService) :
-        CryptoRepository {
+  CryptoRepository {
 
-    override fun getCryptos(currency: Currency, limit: String): Single<List<Crypto>> =
-            webService.getCryptos(currency.name, limit)
-                    .map { it.map { fromResponseToCrypto(it, currency) } }
+  override fun getCryptos(currency: Currency, limit: String): Single<List<Crypto>> =
+    webService.getCryptos(currency.name, limit)
+      .map { it.map { fromResponseToCrypto(it, currency) } }
 
-    override fun getCrypto(id: String, currency: Currency): Single<Crypto> =
-            webService.getCrypto(id, currency.name)
-                    .map { fromResponseToCrypto(it.first(), currency) }
+  override fun getCrypto(id: String, currency: Currency): Single<Crypto> =
+    webService.getCrypto(id, currency.name)
+      .map { fromResponseToCrypto(it.first(), currency) }
 
-    /**
-     * Convert from web response to crypto depending on currency
-     */
-    private fun fromResponseToCrypto(cryptoResponse: CryptoResponse, currency: Currency): Crypto {
-        val price = when (currency) {
-            Currency.USD -> cryptoResponse.priceUsd
-            Currency.EUR -> cryptoResponse.priceEur
-            Currency.CNY -> cryptoResponse.priceCny
-        } ?: ""
-        val volume24h = when (currency) {
-            Currency.USD -> cryptoResponse._24hVolumeUsd
-            Currency.EUR -> cryptoResponse._24hVolumeEur
-            Currency.CNY -> cryptoResponse._24hVolumeCny
-        } ?: ""
-        val marketCap = when (currency) {
-            Currency.USD -> cryptoResponse.marketCapUsd
-            Currency.EUR -> cryptoResponse.marketCapEur
-            Currency.CNY -> cryptoResponse.marketCapCny
-        } ?: ""
-        return Crypto(cryptoResponse.id,
-                cryptoResponse.name,
-                cryptoResponse.rank,
-                cryptoResponse.symbol,
-                price,
-                volume24h,
-                cryptoResponse.priceBtc,
-                cryptoResponse.percentChange1h ?: "",
-                cryptoResponse.percentChange24h ?: "",
-                cryptoResponse.percentChange7d ?: "",
-                cryptoResponse.availableSupply ?: "",
-                cryptoResponse.totalSupply ?: "",
-                currency,
-                marketCap)
-    }
+  /**
+   * Convert from web response to crypto depending on currency
+   */
+  private fun fromResponseToCrypto(cryptoResponse: CryptoResponse, currency: Currency) =
+    Crypto(cryptoResponse.id,
+           cryptoResponse.name,
+           cryptoResponse.rank,
+           cryptoResponse.symbol,
+           cryptoResponse.price(currency),
+           cryptoResponse.volume24h(currency),
+           cryptoResponse.priceBtc,
+           cryptoResponse.percentChange1h ?: "",
+           cryptoResponse.percentChange24h ?: "",
+           cryptoResponse.percentChange7d ?: "",
+           cryptoResponse.availableSupply ?: "",
+           cryptoResponse.totalSupply ?: "",
+           currency,
+           cryptoResponse.marketCap(currency))
+
+
+  private fun CryptoResponse.price(currency: Currency) = when (currency) {
+                                                           Currency.USD -> priceUsd
+                                                           Currency.EUR -> priceEur
+                                                           Currency.CNY -> priceCny
+                                                         } ?: ""
+
+  private fun CryptoResponse.volume24h(currency: Currency) = when (currency) {
+                                                               Currency.USD -> _24hVolumeUsd
+                                                               Currency.EUR -> _24hVolumeEur
+                                                               Currency.CNY -> _24hVolumeCny
+                                                             } ?: ""
+
+  private fun CryptoResponse.marketCap(currency: Currency) = when (currency) {
+                                                               Currency.USD -> marketCapUsd
+                                                               Currency.EUR -> marketCapEur
+                                                               Currency.CNY -> marketCapCny
+                                                             } ?: ""
 }

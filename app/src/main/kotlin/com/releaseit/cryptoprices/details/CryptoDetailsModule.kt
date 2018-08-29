@@ -32,9 +32,11 @@ class CryptoDetailsModule {
 
   @Provides
   @PerFragment
-  fun rxFeedback(@Named(CryptoDetailsFragment.KEY_ID) id: String, repository: CryptoRepository,
+  fun rxFeedback(@Named(CryptoDetailsFragment.KEY_ID) id: String,
+                 repository: CryptoRepository,
                  prefs: Prefs,
-                 view: CryptoDetailsView, navigator: Navigator): Driver<State> =
+                 view: CryptoDetailsView,
+                 navigator: Navigator): Driver<State> =
     Driver.system(State.initial,
                   { s, e -> State.reduce(s, e) },
                   listOf(repository.feedback(id), prefs.feedback, view.feedback(navigator)))
