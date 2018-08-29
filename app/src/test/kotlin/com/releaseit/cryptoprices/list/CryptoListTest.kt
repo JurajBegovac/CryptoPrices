@@ -10,7 +10,7 @@ import org.notests.rxfeedback.Optional
 import java.util.*
 
 @RunWith(MockitoJUnitRunner::class)
-class CryptoListTest {
+class CryptoListTest : Assert() {
 
   @Test
   fun testReducer_dataLoaded_initialState() {
@@ -18,10 +18,10 @@ class CryptoListTest {
     val items = dummyItems()
     val loadedState = State.reduce(initialState, Event.DataLoaded(items))
 
-    Assert.assertEquals(items, loadedState.items)
-    Assert.assertEquals(true, loadedState.error is Optional.None)
-    Assert.assertEquals(false, loadedState.loading)
-    Assert.assertEquals(initialState.currency, loadedState.currency)
+    assertEquals(items, loadedState.items)
+    assertEquals(true, loadedState.error is Optional.None)
+    assertEquals(false, loadedState.loading)
+    assertEquals(initialState.currency, loadedState.currency)
   }
 
   @Test
@@ -30,10 +30,10 @@ class CryptoListTest {
     val items = dummyItems()
     val loadedState = State.reduce(initialState, Event.DataLoaded(items))
 
-    Assert.assertEquals(items, loadedState.items)
-    Assert.assertEquals(true, loadedState.error is Optional.None)
-    Assert.assertEquals(false, loadedState.loading)
-    Assert.assertEquals(initialState.currency, loadedState.currency)
+    assertEquals(items, loadedState.items)
+    assertEquals(true, loadedState.error is Optional.None)
+    assertEquals(false, loadedState.loading)
+    assertEquals(initialState.currency, loadedState.currency)
   }
 
   @Test
@@ -42,10 +42,10 @@ class CryptoListTest {
     val items = dummyItems()
     val loadedState = State.reduce(initialState, Event.DataLoaded(items))
 
-    Assert.assertEquals(items, loadedState.items)
-    Assert.assertEquals(true, loadedState.error is Optional.None)
-    Assert.assertEquals(false, loadedState.loading)
-    Assert.assertEquals(initialState.currency, loadedState.currency)
+    assertEquals(items, loadedState.items)
+    assertEquals(true, loadedState.error is Optional.None)
+    assertEquals(false, loadedState.loading)
+    assertEquals(initialState.currency, loadedState.currency)
   }
 
   @Test
@@ -53,10 +53,10 @@ class CryptoListTest {
     val initialState = State.initial()
     val loadedState = State.reduce(initialState, Event.Error(StateError.NoInternet))
 
-    Assert.assertEquals(initialState.items, loadedState.items)
-    Assert.assertEquals(Optional.Some(StateError.NoInternet), loadedState.error)
-    Assert.assertEquals(false, loadedState.loading)
-    Assert.assertEquals(initialState.currency, loadedState.currency)
+    assertEquals(initialState.items, loadedState.items)
+    assertEquals(Optional.Some(StateError.NoInternet), loadedState.error)
+    assertEquals(false, loadedState.loading)
+    assertEquals(initialState.currency, loadedState.currency)
   }
 
   @Test
@@ -64,10 +64,10 @@ class CryptoListTest {
     val initialState = State.loadedWithItems()
     val loadedState = State.reduce(initialState, Event.Error(StateError.NoInternet))
 
-    Assert.assertEquals(initialState.items, loadedState.items)
-    Assert.assertEquals(Optional.Some(StateError.NoInternet), loadedState.error)
-    Assert.assertEquals(false, loadedState.loading)
-    Assert.assertEquals(initialState.currency, loadedState.currency)
+    assertEquals(initialState.items, loadedState.items)
+    assertEquals(Optional.Some(StateError.NoInternet), loadedState.error)
+    assertEquals(false, loadedState.loading)
+    assertEquals(initialState.currency, loadedState.currency)
   }
 
   @Test
@@ -75,10 +75,10 @@ class CryptoListTest {
     val initialState = State.loading()
     val loadedState = State.reduce(initialState, Event.Error(StateError.NoInternet))
 
-    Assert.assertEquals(initialState.items, loadedState.items)
-    Assert.assertEquals(Optional.Some(StateError.NoInternet), loadedState.error)
-    Assert.assertEquals(false, loadedState.loading)
-    Assert.assertEquals(initialState.currency, loadedState.currency)
+    assertEquals(initialState.items, loadedState.items)
+    assertEquals(Optional.Some(StateError.NoInternet), loadedState.error)
+    assertEquals(false, loadedState.loading)
+    assertEquals(initialState.currency, loadedState.currency)
   }
 
   @Test
@@ -86,10 +86,10 @@ class CryptoListTest {
     val initialState = State.initial()
     val loadedState = State.reduce(initialState, Event.Error(StateError.Unknown))
 
-    Assert.assertEquals(initialState.items, loadedState.items)
-    Assert.assertEquals(Optional.Some(StateError.Unknown), loadedState.error)
-    Assert.assertEquals(false, loadedState.loading)
-    Assert.assertEquals(initialState.currency, loadedState.currency)
+    assertEquals(initialState.items, loadedState.items)
+    assertEquals(Optional.Some(StateError.Unknown), loadedState.error)
+    assertEquals(false, loadedState.loading)
+    assertEquals(initialState.currency, loadedState.currency)
   }
 
   @Test
@@ -97,10 +97,10 @@ class CryptoListTest {
     val initialState = State.loadedWithItems()
     val loadedState = State.reduce(initialState, Event.Error(StateError.Unknown))
 
-    Assert.assertEquals(initialState.items, loadedState.items)
-    Assert.assertEquals(Optional.Some(StateError.Unknown), loadedState.error)
-    Assert.assertEquals(false, loadedState.loading)
-    Assert.assertEquals(initialState.currency, loadedState.currency)
+    assertEquals(initialState.items, loadedState.items)
+    assertEquals(Optional.Some(StateError.Unknown), loadedState.error)
+    assertEquals(false, loadedState.loading)
+    assertEquals(initialState.currency, loadedState.currency)
   }
 
   @Test
@@ -108,10 +108,10 @@ class CryptoListTest {
     val initialState = State.loading()
     val loadedState = State.reduce(initialState, Event.Error(StateError.Unknown))
 
-    Assert.assertEquals(initialState.items, loadedState.items)
-    Assert.assertEquals(Optional.Some(StateError.Unknown), loadedState.error)
-    Assert.assertEquals(false, loadedState.loading)
-    Assert.assertEquals(initialState.currency, loadedState.currency)
+    assertEquals(initialState.items, loadedState.items)
+    assertEquals(Optional.Some(StateError.Unknown), loadedState.error)
+    assertEquals(false, loadedState.loading)
+    assertEquals(initialState.currency, loadedState.currency)
   }
 
   @Test
@@ -119,10 +119,10 @@ class CryptoListTest {
     val initialState = State.initial()
     val loadedState = State.reduce(initialState, Event.CurrencyChanged(Currency.EUR))
 
-    Assert.assertEquals(initialState.items, loadedState.items)
-    Assert.assertEquals(true, loadedState.error is Optional.None)
-    Assert.assertEquals(true, loadedState.loading)
-    Assert.assertEquals(Currency.EUR, loadedState.currency)
+    assertEquals(initialState.items, loadedState.items)
+    assertEquals(true, loadedState.error is Optional.None)
+    assertEquals(true, loadedState.loading)
+    assertEquals(Currency.EUR, loadedState.currency)
   }
 
   @Test
@@ -130,10 +130,10 @@ class CryptoListTest {
     val initialState = State.loadedWithItems()
     val loadedState = State.reduce(initialState, Event.CurrencyChanged(Currency.EUR))
 
-    Assert.assertEquals(initialState.items, loadedState.items)
-    Assert.assertEquals(true, loadedState.error is Optional.None)
-    Assert.assertEquals(true, loadedState.loading)
-    Assert.assertEquals(Currency.EUR, loadedState.currency)
+    assertEquals(initialState.items, loadedState.items)
+    assertEquals(true, loadedState.error is Optional.None)
+    assertEquals(true, loadedState.loading)
+    assertEquals(Currency.EUR, loadedState.currency)
   }
 
   @Test
@@ -141,10 +141,10 @@ class CryptoListTest {
     val initialState = State.loading()
     val loadedState = State.reduce(initialState, Event.CurrencyChanged(Currency.EUR))
 
-    Assert.assertEquals(initialState.items, loadedState.items)
-    Assert.assertEquals(true, loadedState.error is Optional.None)
-    Assert.assertEquals(true, loadedState.loading)
-    Assert.assertEquals(Currency.EUR, loadedState.currency)
+    assertEquals(initialState.items, loadedState.items)
+    assertEquals(true, loadedState.error is Optional.None)
+    assertEquals(true, loadedState.loading)
+    assertEquals(Currency.EUR, loadedState.currency)
   }
 
   @Test
@@ -152,10 +152,10 @@ class CryptoListTest {
     val initialState = State.initial()
     val loadedState = State.reduce(initialState, Event.ReloadData)
 
-    Assert.assertEquals(initialState.items, loadedState.items)
-    Assert.assertEquals(true, loadedState.error is Optional.None)
-    Assert.assertEquals(true, loadedState.loading)
-    Assert.assertEquals(initialState.currency, loadedState.currency)
+    assertEquals(initialState.items, loadedState.items)
+    assertEquals(true, loadedState.error is Optional.None)
+    assertEquals(true, loadedState.loading)
+    assertEquals(initialState.currency, loadedState.currency)
   }
 
   @Test
@@ -163,10 +163,10 @@ class CryptoListTest {
     val initialState = State.loadedWithItems()
     val loadedState = State.reduce(initialState, Event.ReloadData)
 
-    Assert.assertEquals(initialState.items, loadedState.items)
-    Assert.assertEquals(true, loadedState.error is Optional.None)
-    Assert.assertEquals(true, loadedState.loading)
-    Assert.assertEquals(initialState.currency, loadedState.currency)
+    assertEquals(initialState.items, loadedState.items)
+    assertEquals(true, loadedState.error is Optional.None)
+    assertEquals(true, loadedState.loading)
+    assertEquals(initialState.currency, loadedState.currency)
   }
 
   @Test
@@ -174,10 +174,10 @@ class CryptoListTest {
     val initialState = State.loading()
     val loadedState = State.reduce(initialState, Event.ReloadData)
 
-    Assert.assertEquals(initialState.items, loadedState.items)
-    Assert.assertEquals(true, loadedState.error is Optional.None)
-    Assert.assertEquals(true, loadedState.loading)
-    Assert.assertEquals(initialState.currency, loadedState.currency)
+    assertEquals(initialState.items, loadedState.items)
+    assertEquals(true, loadedState.error is Optional.None)
+    assertEquals(true, loadedState.loading)
+    assertEquals(initialState.currency, loadedState.currency)
   }
 
 }

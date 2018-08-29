@@ -43,6 +43,14 @@ android {
         }
     }
 
+    applicationVariants.all { variant ->
+        variant.runtimeConfiguration.resolutionStrategy {
+            force 'com.android.support:appcompat-v7:' + versions.support
+            force 'com.android.support:design:' + versions.support
+            force 'com.android.support:recyclerview-v7:' + versions.support
+        }
+    }
+
     // more lint config on link: https://developer.android.com/studio/write/lint.html#gradle
     lintOptions {
         // Turns off checks for the issue IDs you specify.
@@ -111,6 +119,5 @@ dependencies {
     testImplementation 'junit:junit:' + versions.junit
     testImplementation 'org.mockito:mockito-core:' + versions.mockito
     testImplementation 'android.arch.core:core-testing:' + versions.archLifecycle
-    androidTestImplementation 'com.android.support.test:runner:' + versions.test_runner
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:' + versions.espresso
 }
