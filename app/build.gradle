@@ -43,14 +43,6 @@ android {
         }
     }
 
-    applicationVariants.all { variant ->
-        variant.runtimeConfiguration.resolutionStrategy {
-            force 'com.android.support:appcompat-v7:' + versions.support
-            force 'com.android.support:design:' + versions.support
-            force 'com.android.support:recyclerview-v7:' + versions.support
-        }
-    }
-
     // more lint config on link: https://developer.android.com/studio/write/lint.html#gradle
     lintOptions {
         // Turns off checks for the issue IDs you specify.
@@ -110,7 +102,6 @@ dependencies {
     implementation 'com.jakewharton.rxbinding2:rxbinding-appcompat-v7-kotlin:' + versions.rxbinding
     implementation 'com.jakewharton.rxbinding2:rxbinding-design-kotlin:' + versions.rxbinding
     implementation 'com.jakewharton.rxbinding2:rxbinding-recyclerview-v7-kotlin:' + versions.rxbinding
-    implementation 'com.jakewharton.rxbinding2:rxbinding-leanback-v17-kotlin:' + versions.rxbinding
 
     // rx feedback - rx redux
     implementation 'com.github.NoTests:RxFeedback.kt:0.1.6'
