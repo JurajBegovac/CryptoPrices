@@ -20,27 +20,26 @@ class WebModule {
 
   @Singleton
   @Provides
-  fun okHttpClient(): OkHttpClient {
-    val builder = OkHttpClient.Builder()
+  fun okHttpClient(): OkHttpClient =
+    OkHttpClient.Builder()
       .readTimeout(1, TimeUnit.MINUTES)
       .writeTimeout(1, TimeUnit.MINUTES)
-    return builder.build()
-  }
+      .build()
+
 
   @Provides
   @Singleton
-  fun retrofit(okHttpClient: OkHttpClient): Retrofit {
-    return Retrofit.Builder()
+  fun retrofit(okHttpClient: OkHttpClient): Retrofit =
+    Retrofit.Builder()
       .baseUrl(BuildConfig.API_URL)
       .addConverterFactory(GsonConverterFactory.create())
       .addCallAdapterFactory(RxJava2CallAdapterFactory.createWithScheduler(Schedulers.io()))
       .client(okHttpClient)
       .build()
-  }
+
 
   @Provides
   @Singleton
-  fun cryptoWebService(retrofit: Retrofit): CryptoWebService {
-    return retrofit.create<CryptoWebService>(CryptoWebService::class.java)
-  }
+  fun cryptoWebService(retrofit: Retrofit): CryptoWebService =
+    retrofit.create<CryptoWebService>(CryptoWebService::class.java)
 }

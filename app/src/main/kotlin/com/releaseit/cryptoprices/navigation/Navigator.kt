@@ -1,8 +1,6 @@
 package com.releaseit.cryptoprices.navigation
 
-import android.support.annotation.IdRes
-import android.support.v4.app.Fragment
-import android.support.v4.app.FragmentActivity
+import androidx.fragment.app.Fragment
 
 /** Created by jurajbegovac on 14/02/2018. */
 
@@ -12,8 +10,8 @@ import android.support.v4.app.FragmentActivity
 interface Navigator {
   companion object
 
-  fun navigateTo(screen: Screen)
-  fun navigateBack()
+  fun to(screen: Screen)
+  fun back()
 }
 
 /**
@@ -26,18 +24,12 @@ sealed class Screen {
 }
 
 /**
- * Extensions (helpers)
+ * Helpers
  */
-fun Navigator.Companion.showFragmentWithBackStack(activity: FragmentActivity,
-                                                  fragment: Fragment, @IdRes container: Int) {
-  activity.supportFragmentManager.beginTransaction()
-    .addToBackStack(null)
-    .replace(container, fragment)
-    .commit()
-}
+val Fragment.navigation: Navigator
+  get() = object : Navigator {
+    private val navigator = activity as? Navigator
 
-fun Navigator.Companion.showFragment(activity: FragmentActivity, fragment: Fragment, @IdRes container: Int) {
-  activity.supportFragmentManager.beginTransaction()
-    .replace(container, fragment)
-    .commit()
-}
+    override fun to(screen: Screen) = navigator?.to(screen) ?: Unit
+    override fun back() = navigator?.back() ?: Unit
+  }

@@ -33,25 +33,24 @@ class SettingsActivity : DaggerAppCompatActivity() {
     val currentCurrency = prefs.currency
 
     Currency.values()
-      .forEach {
+      .forEach { currency ->
         val radioButton = RadioButton(this)
-        radioButton.text = it.name
+        radioButton.text = currency.name
         settingsActivityRadioGroup.addView(radioButton)
-        if (it == currentCurrency) radioButton.isChecked = true
+        if (currency == currentCurrency) radioButton.isChecked = true
         radioButton.setOnCheckedChangeListener { _, isChecked ->
           if (isChecked) {
-            currencySelected(it)
+            currency.selected()
           }
         }
       }
   }
 
-  override fun onSupportNavigateUp(): Boolean {
+  override fun onSupportNavigateUp() = true.apply {
     onBackPressed()
-    return true
   }
 
-  private fun currencySelected(currency: Currency) {
-    prefs.currency = currency
+  private fun Currency.selected() {
+    prefs.currency = this
   }
 }

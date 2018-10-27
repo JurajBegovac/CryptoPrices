@@ -2,7 +2,6 @@ package com.releaseit.cryptoprices
 
 import com.releaseit.cryptoprices.main.MainActivity
 import com.releaseit.cryptoprices.main.di.FragmentBuilder
-import com.releaseit.cryptoprices.main.di.MainActivityModule
 import com.releaseit.cryptoprices.settings.SettingsActivity
 import com.releaseit.cryptoprices.utils.dagger2.scopes.PerActivity
 import dagger.Module
@@ -15,7 +14,7 @@ import dagger.android.ContributesAndroidInjector
 abstract class ActivityBuilder {
 
   @PerActivity
-  @ContributesAndroidInjector(modules = [FragmentBuilder::class, MainActivityModule::class])
+  @ContributesAndroidInjector(modules = [FragmentBuilder::class])
   abstract fun bindMainActivity(): MainActivity
 
   @PerActivity

@@ -1,39 +1,32 @@
 package com.releaseit.cryptoprices.main
 
 import android.os.Bundle
-import android.support.v4.app.Fragment
 import com.releaseit.cryptoprices.R
 import com.releaseit.cryptoprices.details.CryptoDetailsFragment
 import com.releaseit.cryptoprices.list.CryptoListFragment
 import com.releaseit.cryptoprices.navigation.Navigator
 import com.releaseit.cryptoprices.navigation.Screen
-import com.releaseit.cryptoprices.navigation.showFragment
-import com.releaseit.cryptoprices.navigation.showFragmentWithBackStack
 import com.releaseit.cryptoprices.settings.SettingsActivity
+import com.releaseit.cryptoprices.utils.showFragment
 import dagger.android.support.DaggerAppCompatActivity
 
 class MainActivity : DaggerAppCompatActivity(), Navigator {
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+  override fun onCreate(savedInstanceState: Bundle?) {
+    super.onCreate(savedInstanceState)
+    setContentView(R.layout.activity_main)
 
-        if (savedInstanceState == null)
-            navigateTo(Screen.CryptoList)
+    if (savedInstanceState == null)
+      to(Screen.CryptoList)
+  }
+
+  override fun to(screen: Screen) =
+    when (screen) {
+      Screen.CryptoList       -> showFragment(CryptoListFragment.newInstance(), R.id.mainActivityContainer)
+      is Screen.CryptoDetails -> showFragment(CryptoDetailsFragment.newInstance(screen.id),
+                                              R.id.mainActivityContainer, true)
+      Screen.Settings         -> startActivity(SettingsActivity.startIntent(this))
     }
 
-    override fun navigateTo(screen: Screen) =
-            when (screen) {
-                Screen.CryptoList -> showFragment(CryptoListFragment.newInstance())
-                is Screen.CryptoDetails -> showFragmentWithBackStack(CryptoDetailsFragment.newInstance(screen.id))
-                Screen.Settings -> startActivity(SettingsActivity.startIntent(this))
-            }
-
-    override fun navigateBack() = onBackPressed()
-
-    private fun showFragment(fragment: Fragment) =
-            Navigator.showFragment(this, fragment, R.id.mainActivityContainer)
-
-    private fun showFragmentWithBackStack(fragment: Fragment) =
-            Navigator.showFragmentWithBackStack(this, fragment, R.id.mainActivityContainer)
+  override fun back() = onBackPressed()
 }

@@ -18,7 +18,7 @@ detekt {
 }
 
 android {
-    compileSdkVersion 27
+    compileSdkVersion 28
 
     sourceSets {
         main.java.srcDirs += 'src/main/kotlin'
@@ -28,10 +28,10 @@ android {
     defaultConfig {
         applicationId "com.releaseit.cryptoprices"
         minSdkVersion 21
-        targetSdkVersion 27
+        targetSdkVersion 28
         versionCode 1
         versionName "1.0"
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
         buildConfigField 'String', 'API_URL', '"https://api.coinmarketcap.com/v1/"'
     }
@@ -60,16 +60,21 @@ android {
 
     check.dependsOn 'detektCheck'
 
+    kapt {
+        generateStubs = true
+    }
 }
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk7:' + versions.kotlin
 
-    implementation 'com.android.support:appcompat-v7:' + versions.support
-    implementation 'com.android.support:design:' + versions.support
-    implementation 'com.android.support:recyclerview-v7:' + versions.support
-    implementation 'com.android.support.constraint:constraint-layout:' + versions.constraint_layout
+    implementation 'androidx.core:core-ktx:' + versions.androidx
+    implementation 'androidx.fragment:fragment-ktx:' + versions.androidx
+    implementation 'androidx.appcompat:appcompat:' + versions.androidx
+    implementation 'com.google.android.material:material:' + versions.androidx
+    implementation 'androidx.recyclerview:recyclerview:' + versions.androidx
+    implementation 'androidx.constraintlayout:constraintlayout:' + versions.constraint_layout
 
     // retrofit
     implementation 'com.squareup.retrofit2:retrofit:' + versions.retrofit
@@ -78,16 +83,16 @@ dependencies {
 
     // dagger
     implementation 'com.google.dagger:dagger:' + versions.dagger
-    kapt 'com.google.dagger:dagger-compiler:' + versions.dagger
     implementation 'com.google.dagger:dagger-android-support:' + versions.dagger
+    kapt 'com.google.dagger:dagger-compiler:' + versions.dagger
     kapt 'com.google.dagger:dagger-android-processor:' + versions.dagger
 
     // lifecycle aware components
-    implementation 'android.arch.lifecycle:livedata:' + versions.archLifecycle
-    implementation 'android.arch.lifecycle:viewmodel:' + versions.archLifecycle
-    implementation 'android.arch.lifecycle:extensions:' + versions.archLifecycle
-    implementation 'android.arch.lifecycle:reactivestreams:' + versions.archLifecycle
-    kapt 'android.arch.lifecycle:compiler:' + versions.archLifecycle
+    implementation 'androidx.lifecycle:lifecycle-livedata:' + versions.archLifecycle
+    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:' + versions.archLifecycle
+    implementation 'androidx.lifecycle:lifecycle-extensions:' + versions.archLifecycle
+    implementation 'androidx.lifecycle:lifecycle-reactivestreams-ktx:' + versions.archLifecycle
+    kapt 'androidx.lifecycle:lifecycle-compiler:' + versions.archLifecycle
 
     // rx java
     implementation 'io.reactivex.rxjava2:rxjava:' + versions.rxjava2
@@ -97,6 +102,7 @@ dependencies {
     // rx preferences
     implementation 'com.f2prateek.rx.preferences2:rx-preferences:' + versions.rx_preferences
 
+    // rxbinding
     implementation 'com.jakewharton.rxbinding2:rxbinding-kotlin:' + versions.rxbinding
     implementation 'com.jakewharton.rxbinding2:rxbinding-support-v4-kotlin:' + versions.rxbinding
     implementation 'com.jakewharton.rxbinding2:rxbinding-appcompat-v7-kotlin:' + versions.rxbinding
@@ -106,9 +112,12 @@ dependencies {
     // rx feedback - rx redux
     implementation 'com.github.NoTests:RxFeedback.kt:0.1.6'
 
+    implementation 'com.github.NoTests.SharedSequence.kt:SharedSequence:0.1.13'
+
     // testing
     testImplementation 'junit:junit:' + versions.junit
-    testImplementation 'org.mockito:mockito-core:' + versions.mockito
-    testImplementation 'android.arch.core:core-testing:' + versions.archLifecycle
-    androidTestImplementation 'com.android.support.test.espresso:espresso-core:' + versions.espresso
+    testImplementation 'io.mockk:mockk:' + versions.mockk
+//    testImplementation 'org.mockito:mockito-core:' + versions.mockito
+    testImplementation 'androidx.arch.core:core-testing:' + versions.archLifecycle
+    androidTestImplementation 'androidx.test.espresso:espresso-core:' + versions.espresso
 }

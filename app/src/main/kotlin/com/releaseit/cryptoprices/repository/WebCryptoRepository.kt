@@ -15,7 +15,9 @@ class WebCryptoRepository @Inject constructor(private val webService: CryptoWebS
 
   override fun getCryptos(currency: Currency, limit: String): Single<List<Crypto>> =
     webService.getCryptos(currency.name, limit)
-      .map { it.map { fromResponseToCrypto(it, currency) } }
+      .map { cryptos ->
+        cryptos.map { fromResponseToCrypto(it, currency) }
+      }
 
   override fun getCrypto(id: String, currency: Currency): Single<Crypto> =
     webService.getCrypto(id, currency.name)

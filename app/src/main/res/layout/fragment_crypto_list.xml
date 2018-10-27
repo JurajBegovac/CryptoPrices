@@ -6,7 +6,7 @@
   android:orientation="vertical"
   tools:context="com.releaseit.cryptoprices.list.CryptoListFragment">
 
-  <android.support.v7.widget.Toolbar
+  <androidx.appcompat.widget.Toolbar
     android:id="@+id/cryptoListFragmentToolbar"
     android:layout_width="match_parent"
     android:layout_height="?attr/actionBarSize"
@@ -15,7 +15,7 @@
     app:title="@string/app_name"
     app:titleTextColor="@android:color/white" />
 
-  <android.support.v4.widget.SwipeRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
+  <androidx.swiperefreshlayout.widget.SwipeRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/cryptoListFragmentSwipeRefreshLayout"
     android:layout_width="match_parent"
@@ -29,11 +29,11 @@
 
       <include layout="@layout/item_crypto" />
 
-      <android.support.v7.widget.RecyclerView
+      <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/cryptoListFragmentRecylerView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:scrollbars="vertical" />
     </LinearLayout>
-  </android.support.v4.widget.SwipeRefreshLayout>
+  </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 </LinearLayout>
