@@ -1,6 +1,7 @@
 package com.releaseit.cryptoprices.details
 
 import androidx.annotation.StringRes
+import androidx.recyclerview.widget.DiffUtil
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.jakewharton.rxbinding2.support.v4.widget.RxSwipeRefreshLayout
 import com.releaseit.cryptoprices.R
@@ -49,7 +50,7 @@ val Driver<State>.title
   get() = crypto.map { it.name }.distinctUntilChanged()
 
 val Driver<State>.details
-  get() = crypto.map { it.detailItems }.distinctUntilChanged()
+  get() = crypto.map { it.detailItems }
 
 val Driver<State>.errorResId
   get() = error.map { it.errorStringResId }
@@ -85,4 +86,14 @@ val Crypto.detailItems: List<CryptoDetailItem>
     CryptoDetailItem(R.string.crypto_detail_total_supply, totalSupply),
     CryptoDetailItem(R.string.crypto_detail_available_supply, availableSupply))
 
-data class CryptoDetailItem(@StringRes val nameResId: Int, val value: String)
+data class CryptoDetailItem(@StringRes val nameResId: Int, val value: String) {
+  companion object {
+    val DIFF = object : DiffUtil.ItemCallback<CryptoDetailItem>() {
+      override fun areItemsTheSame(oldItem: CryptoDetailItem, newItem: CryptoDetailItem) = oldItem.nameResId ==
+        newItem.nameResId
+
+      override fun areContentsTheSame(oldItem: CryptoDetailItem, newItem: CryptoDetailItem): Boolean =
+        oldItem == newItem
+    }
+  }
+}

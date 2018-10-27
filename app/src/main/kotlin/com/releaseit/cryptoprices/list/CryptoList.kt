@@ -5,7 +5,9 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.jakewharton.rxbinding2.support.v4.widget.RxSwipeRefreshLayout
@@ -16,6 +18,7 @@ import com.releaseit.cryptoprices.navigation.navigation
 import com.releaseit.cryptoprices.repository.Crypto
 import com.releaseit.cryptoprices.repository.CryptoRepository
 import com.releaseit.cryptoprices.repository.CryptoRepository.Companion.LIMIT
+import com.releaseit.cryptoprices.utils.ClickableListItem
 import com.releaseit.cryptoprices.utils.Prefs
 import com.releaseit.cryptoprices.utils.RxFeedbackView
 import com.releaseit.cryptoprices.utils.RxFeedbackViewModel
@@ -148,8 +151,8 @@ interface CryptoListView : RxFeedbackView<State, Event> {
 
   override fun invoke(state: Driver<State>): Bindings<Event> {
     val itemsDisposable =
-      state.map { it.items }
-        .distinctUntilChanged()
+      state
+        .map { it.items }
         .drive { showItems(it) }
 
     val loadingDisposable = state.map { it.loading }
@@ -192,7 +195,11 @@ class CryptoListFragment : DaggerFragment(), CryptoListView {
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
-    cryptoListFragmentRecylerView.layoutManager = LinearLayoutManager(context)
+    cryptoListFragmentRecylerView.apply {
+      layoutManager = LinearLayoutManager(context)
+      adapter = CryptoAdapter()
+    }
+
     cryptoListFragmentToolbar.apply {
       inflateMenu(R.menu.menu_main)
       setOnMenuItemClickListener { menuItem ->
@@ -205,10 +212,11 @@ class CryptoListFragment : DaggerFragment(), CryptoListView {
     get() = cryptoListFragmentSwipeRefreshLayout
 
   override fun showItems(items: List<Crypto>) {
-    cryptoListFragmentRecylerView.adapter = CryptoAdapter(
-      { items[it].listItem },
-      { items.count() },
-      { navigation.to(CryptoDetails(items[it].id)) })
+    (cryptoListFragmentRecylerView.adapter as? CryptoAdapter)?.submitList(items.map { crypto ->
+      crypto.listItem {
+        navigation.to(CryptoDetails(it.id))
+      }
+    })
   }
 
   override fun showLoading(loading: Boolean) {
@@ -227,34 +235,38 @@ class CryptoListFragment : DaggerFragment(), CryptoListView {
 /**
  * Mapper from Crypto to CryptoListItem
  */
-private val Crypto.listItem: CryptoListItem
-  get() = CryptoListItem(rank, symbol, "$price ${currency.name}", "$percentChange24h%")
+private fun Crypto.listItem(onClick: (CryptoListItem) -> Unit): CryptoListItem =
+  CryptoListItem(id, rank, symbol, "$price ${currency.name}", "$percentChange24h%", onClick)
 
 /**
  * List item
  */
-data class CryptoListItem(val rank: String, val symbol: String, val price: String, val percentChange24h: String)
+data class CryptoListItem(val id: String, val rank: String, val symbol: String, val price: String, val
+percentChange24h: String, override val onClick: (CryptoListItem) -> Unit) :
+  ClickableListItem<CryptoListItem> {
+  companion object {
+    val DIFF = object : DiffUtil.ItemCallback<CryptoListItem>() {
+      override fun areItemsTheSame(oldItem: CryptoListItem, newItem: CryptoListItem) = oldItem.id == newItem.id
+      override fun areContentsTheSame(oldItem: CryptoListItem, newItem: CryptoListItem) = oldItem == newItem
+    }
+  }
+}
 
 /**
  * Recyclerview adapter
  */
-private class CryptoAdapter(
-  private val itemProvider: (Int) -> CryptoListItem, private val itemCount: () -> Int,
-  private val clickListener: (Int) -> (Unit)) : RecyclerView.Adapter<CryptoViewHolder>() {
-
-  override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) =
+private class CryptoAdapter : ListAdapter<CryptoListItem, CryptoViewHolder>(CryptoListItem.DIFF) {
+  override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CryptoViewHolder =
     CryptoViewHolder(parent.inflate(R.layout.item_crypto))
 
-  override fun getItemCount() = itemCount()
-
   override fun onBindViewHolder(holder: CryptoViewHolder, position: Int) {
-    holder.bind(itemProvider(position)) { clickListener(position) }
+    holder.bind(getItem(position))
   }
 }
 
 private class CryptoViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-  fun bind(item: CryptoListItem, clickListener: () -> Unit) {
-    itemView.itemCryptoRoot.setOnClickListener { clickListener() }
+  fun bind(item: CryptoListItem) {
+    itemView.itemCryptoRoot.setOnClickListener { item.onClick(item) }
     itemView.itemCryptoRank.text = item.rank
     itemView.itemCryptoSymbol.text = item.symbol
     itemView.itemCryptoPrice.text = item.price

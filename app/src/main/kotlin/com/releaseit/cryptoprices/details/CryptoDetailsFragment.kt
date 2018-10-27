@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import androidx.annotation.StringRes
 import androidx.core.os.bundleOf
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.releaseit.cryptoprices.R
@@ -44,7 +45,10 @@ class CryptoDetailsFragment : DaggerFragment(), CryptoDetailsView {
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
-    cryptoDetailsFragmentRecylerView.layoutManager = LinearLayoutManager(context)
+    cryptoDetailsFragmentRecylerView.apply {
+      layoutManager = LinearLayoutManager(context)
+      adapter = CryptoDetailAdapter()
+    }
     cryptoDetailsFragmentToolbar.apply {
       inflateMenu(R.menu.menu_main)
       setOnMenuItemClickListener { menuItem ->
@@ -73,20 +77,17 @@ class CryptoDetailsFragment : DaggerFragment(), CryptoDetailsView {
   }
 
   override fun showDetails(details: List<CryptoDetailItem>) {
-    cryptoDetailsFragmentRecylerView.adapter = CryptoAdapter(details)
+    (cryptoDetailsFragmentRecylerView.adapter as? CryptoDetailAdapter)?.submitList(details)
   }
 }
 
-private class CryptoAdapter(private val items: List<CryptoDetailItem>) :
-  RecyclerView.Adapter<CryptoDetailsViewHolder>() {
+private class CryptoDetailAdapter : ListAdapter<CryptoDetailItem, CryptoDetailsViewHolder>(CryptoDetailItem.DIFF) {
 
   override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) =
     CryptoDetailsViewHolder(parent.inflate(R.layout.item_crypto_details))
 
-  override fun getItemCount() = items.count()
-
   override fun onBindViewHolder(holder: CryptoDetailsViewHolder, position: Int) {
-    holder.bind(items[position])
+    holder.bind(getItem(position))
   }
 }
 
