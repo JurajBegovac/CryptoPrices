@@ -110,7 +110,7 @@ dependencies {
     implementation 'com.jakewharton.rxbinding2:rxbinding-recyclerview-v7-kotlin:' + versions.rxbinding
 
     // rx feedback - rx redux
-    implementation 'com.github.NoTests:RxFeedback.kt:0.1.6'
+    implementation 'com.github.NoTests:RxFeedback.kt:0.1.7'
 
     implementation 'com.github.NoTests.SharedSequence.kt:SharedSequence:0.1.13'
 
