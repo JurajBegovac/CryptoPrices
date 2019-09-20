@@ -5,10 +5,7 @@ import android.content.SharedPreferences
 import androidx.core.content.edit
 import com.f2prateek.rx.preferences2.RxSharedPreferences
 import com.releaseit.cryptoprices.repository.Currency
-import com.releaseit.cryptoprices.utils.dagger2.qualifiers.ApplicationContext
 import io.reactivex.Observable
-import javax.inject.Inject
-import javax.inject.Singleton
 
 /**
  * Created by jurajbegovac on 13/02/2018.
@@ -34,8 +31,7 @@ interface Prefs {
   val currencyObservable: Observable<Currency>
 }
 
-@Singleton
-class DefaultPrefs @Inject constructor(@ApplicationContext context: Context) : Prefs {
+class DefaultPrefs constructor(context: Context) : Prefs {
 
   private val sharedPreferences = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
   private val rxSharedPreferences = sharedPreferences.rx()

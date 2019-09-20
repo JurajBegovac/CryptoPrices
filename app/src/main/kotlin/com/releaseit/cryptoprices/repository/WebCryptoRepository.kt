@@ -3,15 +3,11 @@ package com.releaseit.cryptoprices.repository
 import com.releaseit.cryptoprices.web.CryptoResponse
 import com.releaseit.cryptoprices.web.CryptoWebService
 import io.reactivex.Single
-import javax.inject.Inject
-import javax.inject.Singleton
 
 /**
  * Created by jurajbegovac on 12/02/2018.
  */
-@Singleton
-class WebCryptoRepository @Inject constructor(private val webService: CryptoWebService) :
-  CryptoRepository {
+class WebCryptoRepository constructor(private val webService: CryptoWebService) : CryptoRepository {
 
   override fun getCryptos(currency: Currency, limit: String): Single<List<Crypto>> =
     webService.getCryptos(currency.name, limit)

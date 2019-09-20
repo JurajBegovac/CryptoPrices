@@ -1,6 +1,7 @@
 package com.releaseit.cryptoprices.main
 
 import android.os.Bundle
+import androidx.appcompat.app.AppCompatActivity
 import com.releaseit.cryptoprices.R
 import com.releaseit.cryptoprices.details.CryptoDetailsFragment
 import com.releaseit.cryptoprices.list.CryptoListFragment
@@ -8,9 +9,8 @@ import com.releaseit.cryptoprices.navigation.Navigator
 import com.releaseit.cryptoprices.navigation.Screen
 import com.releaseit.cryptoprices.settings.SettingsActivity
 import com.releaseit.cryptoprices.utils.showFragment
-import dagger.android.support.DaggerAppCompatActivity
 
-class MainActivity : DaggerAppCompatActivity(), Navigator {
+class MainActivity : AppCompatActivity(), Navigator {
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
@@ -22,7 +22,8 @@ class MainActivity : DaggerAppCompatActivity(), Navigator {
 
   override fun to(screen: Screen) =
     when (screen) {
-      Screen.CryptoList       -> showFragment(CryptoListFragment.newInstance(), R.id.mainActivityContainer)
+      Screen.CryptoList       -> showFragment(CryptoListFragment.newInstance(),
+                                              R.id.mainActivityContainer)
       is Screen.CryptoDetails -> showFragment(CryptoDetailsFragment.newInstance(screen.id),
                                               R.id.mainActivityContainer, true)
       Screen.Settings         -> startActivity(SettingsActivity.startIntent(this))

@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.StringRes
 import androidx.core.os.bundleOf
+import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -17,16 +18,17 @@ import com.releaseit.cryptoprices.navigation.navigation
 import com.releaseit.cryptoprices.utils.bindUI
 import com.releaseit.cryptoprices.utils.inflate
 import com.releaseit.cryptoprices.utils.showToast
-import com.releaseit.cryptoprices.utils.viewModel
-import dagger.android.support.DaggerFragment
 import kotlinx.android.synthetic.main.fragment_crypto_details.*
 import kotlinx.android.synthetic.main.item_crypto_details.view.*
-import javax.inject.Inject
+import org.koin.androidx.viewmodel.ext.android.viewModel
+import org.koin.core.parameter.parametersOf
+import org.koin.core.qualifier.named
 
-class CryptoDetailsFragment : DaggerFragment(), CryptoDetailsView {
+class CryptoDetailsFragment : Fragment(), CryptoDetailsView {
 
-  @Inject
-  lateinit var viewModelFactory: CryptoDetailsViewModelFactory
+  private val viewModel: CryptoDetailsViewModel by viewModel(qualifier = named("CryptoDetailsViewModel")) {
+    parametersOf(arguments!!.getString(KEY_ID)!!)
+  }
 
   companion object {
     const val KEY_ID = "CryptoDetailsFragment:key:id"
@@ -37,10 +39,12 @@ class CryptoDetailsFragment : DaggerFragment(), CryptoDetailsView {
 
   override fun onAttach(context: Context?) {
     super.onAttach(context)
-    viewModel(viewModelFactory).bindUI(this)
+    viewModel.bindUI(this)
   }
 
-  override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
+  override fun onCreateView(inflater: LayoutInflater,
+                            container: ViewGroup?,
+                            savedInstanceState: Bundle?): View =
     inflater.inflate(R.layout.fragment_crypto_details, container, false)
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -52,8 +56,10 @@ class CryptoDetailsFragment : DaggerFragment(), CryptoDetailsView {
     cryptoDetailsFragmentToolbar.apply {
       inflateMenu(R.menu.menu_main)
       setOnMenuItemClickListener { menuItem ->
-        menuItem.takeIf { it.itemId == R.id.menu_action_settings }?.let { navigation.to(Screen.Settings); true }
-        ?: false
+        menuItem.takeIf { it.itemId == R.id.menu_action_settings }?.let {
+          navigation.to(Screen.Settings)
+          true
+        } ?: false
       }
       setNavigationOnClickListener { navigation.back() }
     }
@@ -81,7 +87,8 @@ class CryptoDetailsFragment : DaggerFragment(), CryptoDetailsView {
   }
 }
 
-private class CryptoDetailAdapter : ListAdapter<CryptoDetailItem, CryptoDetailsViewHolder>(CryptoDetailItem.DIFF) {
+private class CryptoDetailAdapter :
+  ListAdapter<CryptoDetailItem, CryptoDetailsViewHolder>(CryptoDetailItem.DIFF) {
 
   override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) =
     CryptoDetailsViewHolder(parent.inflate(R.layout.item_crypto_details))

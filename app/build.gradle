@@ -81,11 +81,8 @@ dependencies {
     implementation 'com.squareup.retrofit2:converter-gson:' + versions.retrofit
     implementation 'com.squareup.retrofit2:adapter-rxjava2:' + versions.retrofit
 
-    // dagger
-    implementation 'com.google.dagger:dagger:' + versions.dagger
-    implementation 'com.google.dagger:dagger-android-support:' + versions.dagger
-    kapt 'com.google.dagger:dagger-compiler:' + versions.dagger
-    kapt 'com.google.dagger:dagger-android-processor:' + versions.dagger
+    // koin
+    implementation 'org.koin:koin-androidx-viewmodel:2.0.1'
 
     // lifecycle aware components
     implementation 'androidx.lifecycle:lifecycle-livedata:' + versions.archLifecycle

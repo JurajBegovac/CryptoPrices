@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.ListAdapter
@@ -24,15 +25,12 @@ import com.releaseit.cryptoprices.utils.RxFeedbackView
 import com.releaseit.cryptoprices.utils.RxFeedbackViewModel
 import com.releaseit.cryptoprices.utils.bindUI
 import com.releaseit.cryptoprices.utils.cast
-import com.releaseit.cryptoprices.utils.dagger2.scopes.PerFragment
 import com.releaseit.cryptoprices.utils.inflate
 import com.releaseit.cryptoprices.utils.showToast
-import com.releaseit.cryptoprices.utils.viewModel
-import dagger.Module
-import dagger.Provides
-import dagger.android.support.DaggerFragment
 import kotlinx.android.synthetic.main.fragment_crypto_list.*
 import kotlinx.android.synthetic.main.item_crypto.view.*
+import org.koin.androidx.viewmodel.ext.android.viewModel
+import org.koin.core.qualifier.named
 import org.notests.rxfeedback.Bindings
 import org.notests.rxfeedback.Optional
 import org.notests.rxfeedback.SignalFeedback
@@ -47,7 +45,6 @@ import org.notests.sharedsequence.filter
 import org.notests.sharedsequence.just
 import org.notests.sharedsequence.map
 import java.net.UnknownHostException
-import javax.inject.Inject
 
 /**
  * STATE
@@ -88,7 +85,7 @@ sealed class StateError {
 /**
  * FEEDBACKS
  */
-val Prefs.currencyFeedback: SignalFeedback<State, Event>
+val Prefs.currencyListFeedback: SignalFeedback<State, Event>
   get() = { _ ->
     currencyObservable
       .distinctUntilChanged()
@@ -96,7 +93,8 @@ val Prefs.currencyFeedback: SignalFeedback<State, Event>
       .asSignal { Signal.just(Event.Error(StateError.Unknown)) }
   }
 
-fun loadingFeedback(cryptoRepository: CryptoRepository, prefs: Prefs): SignalFeedback<State, Event> =
+fun loadingFeedback(cryptoRepository: CryptoRepository,
+                    prefs: Prefs): SignalFeedback<State, Event> =
   reactSafe<State, Int, Event>(
     query = {
       if (it.loading) Optional.Some(LIMIT)
@@ -118,26 +116,6 @@ fun loadingFeedback(cryptoRepository: CryptoRepository, prefs: Prefs): SignalFee
  */
 
 typealias CryptoListViewModel = RxFeedbackViewModel<State, Event>
-
-interface CryptoListViewModelFactory : () -> CryptoListViewModel
-
-/**
- * DI - dagger
- */
-@Module
-class CryptoListFragmentModule {
-
-  @PerFragment
-  @Provides
-  fun cryptoListViewModelFactory(cryptoRepository: CryptoRepository,
-                                 prefs: Prefs): CryptoListViewModelFactory =
-    object : CryptoListViewModelFactory {
-      override fun invoke() =
-        CryptoListViewModel(State.initial(),
-                            { s, e -> State.reduce(s, e) },
-                            listOf(prefs.currencyFeedback, loadingFeedback(cryptoRepository, prefs)))
-    }
-}
 
 /**
  * VIEW STUFF - Fragment
@@ -176,21 +154,22 @@ interface CryptoListView : RxFeedbackView<State, Event> {
 val SwipeRefreshLayout.reloadEvent: Signal<Event>
   get() = RxSwipeRefreshLayout.refreshes(this).map<Event> { Event.ReloadData }.asSignal { Signal.empty() }
 
-class CryptoListFragment : DaggerFragment(), CryptoListView {
+class CryptoListFragment : Fragment(), CryptoListView {
 
   companion object {
     fun newInstance() = CryptoListFragment()
   }
 
-  @Inject
-  lateinit var viewModelFactory: CryptoListViewModelFactory
+  private val viewModel by viewModel<CryptoListViewModel>(qualifier = named("CryptoListViewModel"))
 
   override fun onAttach(context: Context?) {
     super.onAttach(context)
-    viewModel(viewModelFactory).bindUI(this)
+    viewModel.bindUI(this)
   }
 
-  override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
+  override fun onCreateView(inflater: LayoutInflater,
+                            container: ViewGroup?,
+                            savedInstanceState: Bundle?): View =
     inflater.inflate(R.layout.fragment_crypto_list, container, false)
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -203,7 +182,8 @@ class CryptoListFragment : DaggerFragment(), CryptoListView {
     cryptoListFragmentToolbar.apply {
       inflateMenu(R.menu.menu_main)
       setOnMenuItemClickListener { menuItem ->
-        menuItem.takeIf { it.itemId == R.id.menu_action_settings }?.let { navigation.to(Settings); true } ?: false
+        menuItem.takeIf { it.itemId == R.id.menu_action_settings }?.let { navigation.to(Settings); true }
+        ?: false
       }
     }
   }
@@ -241,13 +221,21 @@ private fun Crypto.listItem(onClick: (CryptoListItem) -> Unit): CryptoListItem =
 /**
  * List item
  */
-data class CryptoListItem(val id: String, val rank: String, val symbol: String, val price: String, val
-percentChange24h: String, override val onClick: (CryptoListItem) -> Unit) :
+data class CryptoListItem(val id: String,
+                          val rank: String,
+                          val symbol: String,
+                          val price: String,
+                          val
+                          percentChange24h: String,
+                          override val onClick: (CryptoListItem) -> Unit) :
   ClickableListItem<CryptoListItem> {
   companion object {
     val DIFF = object : DiffUtil.ItemCallback<CryptoListItem>() {
-      override fun areItemsTheSame(oldItem: CryptoListItem, newItem: CryptoListItem) = oldItem.id == newItem.id
-      override fun areContentsTheSame(oldItem: CryptoListItem, newItem: CryptoListItem) = oldItem == newItem
+      override fun areItemsTheSame(oldItem: CryptoListItem, newItem: CryptoListItem) =
+        oldItem.id == newItem.id
+
+      override fun areContentsTheSame(oldItem: CryptoListItem, newItem: CryptoListItem) =
+        oldItem == newItem
     }
   }
 }

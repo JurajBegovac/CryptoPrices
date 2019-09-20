@@ -26,8 +26,6 @@ import java.net.UnknownHostException
  */
 typealias CryptoDetailsViewModel = RxFeedbackViewModel<State, Event>
 
-interface CryptoDetailsViewModelFactory : () -> CryptoDetailsViewModel
-
 /**
  * State
  */
@@ -69,7 +67,7 @@ fun State.Companion.reduce(state: State, event: Event) =
  * Feedbacks
  */
 
-val Prefs.currencyFeedback: SignalFeedback<State, Event>
+val Prefs.currencyDetailsFeedback: SignalFeedback<State, Event>
   get() = { _ ->
     currencyObservable
       .distinctUntilChanged()
@@ -77,7 +75,9 @@ val Prefs.currencyFeedback: SignalFeedback<State, Event>
       .asSignal { Signal.just(Event.Error(StateError.Unknown)) }
   }
 
-fun loadingFeedback(cryptoRepository: CryptoRepository, prefs: Prefs, id: String): SignalFeedback<State, Event> =
+fun loadingFeedback(cryptoRepository: CryptoRepository,
+                    prefs: Prefs,
+                    id: String): SignalFeedback<State, Event> =
   reactSafe<State, String, Event>(
     query = {
       if (it.loading) Optional.Some(id)
@@ -89,8 +89,8 @@ fun loadingFeedback(cryptoRepository: CryptoRepository, prefs: Prefs, id: String
         .flatMapSingle { cryptoRepository.getCrypto(cryptoId, it) }
         .map<Event> { Event.CryptoLoaded(it) }
         .asSignal<Event> {
-          if (it is UnknownHostException) org.notests.sharedsequence.Signal.just(Event.Error(StateError.NoInternet))
-          else org.notests.sharedsequence.Signal.just(Event.Error(StateError.Unknown))
+          if (it is UnknownHostException) Signal.just(Event.Error(StateError.NoInternet))
+          else Signal.just(Event.Error(StateError.Unknown))
         }
     })
 

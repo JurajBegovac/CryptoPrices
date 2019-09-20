@@ -4,21 +4,20 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.widget.RadioButton
+import androidx.appcompat.app.AppCompatActivity
 import com.releaseit.cryptoprices.R
 import com.releaseit.cryptoprices.repository.Currency
 import com.releaseit.cryptoprices.utils.Prefs
-import dagger.android.support.DaggerAppCompatActivity
 import kotlinx.android.synthetic.main.activity_settings.*
-import javax.inject.Inject
+import org.koin.android.ext.android.inject
 
-class SettingsActivity : DaggerAppCompatActivity() {
+class SettingsActivity : AppCompatActivity() {
 
   companion object {
     fun startIntent(context: Context) = Intent(context, SettingsActivity::class.java)
   }
 
-  @Inject
-  lateinit var prefs: Prefs
+  private val prefs: Prefs by inject()
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
